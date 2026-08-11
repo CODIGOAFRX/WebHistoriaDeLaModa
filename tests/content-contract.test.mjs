@@ -76,3 +76,17 @@ test("removes decorative diagonal arrows and rejected filler copy from app sourc
     /Rigor sin distancia|Una imagen, una puerta|Conversaci.n abierta|Una buena conferencia|Cada publicaci.n empieza|Aprender a leer una silueta|Historias para escuchar/i,
   );
 });
+
+test("keeps the Chanel title on complete editorial lines", async () => {
+  const [home, library, styles] = await Promise.all([
+    source("app/page.tsx"),
+    source("app/biblioteca/page.tsx"),
+    source("app/globals.css"),
+  ]);
+
+  for (const page of [home, library]) {
+    assert.match(page, /className="book-title-lines"/);
+    assert.match(page, /<span aria-hidden="true">reconocer<\/span>/);
+  }
+  assert.match(styles, /\.book-title-lines > span\s*{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;/s);
+});

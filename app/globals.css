@@ -4358,3 +4358,29 @@ a.conference-video:hover img {
   color: var(--rose-deep);
   text-shadow: none;
 }
+
+/* Título de cubierta: composición editorial sin partir palabras. */
+.book-cover,
+.upcoming-book-face {
+  container-type: inline-size;
+}
+
+#contenido .book-title-lines {
+  max-width: none;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+#contenido .book-cover h2.book-title-lines {
+  font-size: clamp(30px, 21cqw, 78px);
+}
+
+#contenido .upcoming-book-face h2.book-title-lines {
+  font-size: clamp(30px, 22cqw, 82px);
+}
+
+.book-title-lines > span {
+  display: block;
+  white-space: nowrap;
+}

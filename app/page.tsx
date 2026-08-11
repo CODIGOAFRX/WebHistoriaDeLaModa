@@ -233,7 +233,12 @@ export default function Home() {
             <div className="book-spine">Carlos Sánchez de Medina</div>
             <div className="book-cover">
               <span>Próximamente</span>
-              <h2>Cómo reconocer un Chanel</h2>
+              <h2 className="book-title-lines" aria-label="Cómo reconocer un Chanel">
+                <span aria-hidden="true">Cómo</span>
+                <span aria-hidden="true">reconocer</span>
+                <span aria-hidden="true">un</span>
+                <span aria-hidden="true">Chanel</span>
+              </h2>
               <div className="book-cover-mark">HM</div>
               <p>Temas de Hoy</p>
             </div>

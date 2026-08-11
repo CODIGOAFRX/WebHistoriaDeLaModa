@@ -40,7 +40,12 @@ export default async function LibraryPage() {
           <div className="upcoming-book-spine">Temas de Hoy · Grupo Planeta</div>
           <div className="upcoming-book-face">
             <p>Próximamente</p>
-            <h2>Cómo reconocer un Chanel</h2>
+            <h2 className="book-title-lines" aria-label="Cómo reconocer un Chanel">
+              <span aria-hidden="true">Cómo</span>
+              <span aria-hidden="true">reconocer</span>
+              <span aria-hidden="true">un</span>
+              <span aria-hidden="true">Chanel</span>
+            </h2>
             <span>Carlos Sánchez de Medina</span>
             <i aria-hidden="true">02</i>
           </div>
