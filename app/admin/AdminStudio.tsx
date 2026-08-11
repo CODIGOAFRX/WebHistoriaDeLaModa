@@ -616,7 +616,7 @@ export function AdminStudio({
                       </strong>
                       {isCourseRecord(item) && item.scormUrl ? (
                         <a href={item.scormUrl} target="_blank" rel="noreferrer">
-                          Probar SCORM ↗
+                          Probar SCORM
                         </a>
                       ) : null}
                     </div>

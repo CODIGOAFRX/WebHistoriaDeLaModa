@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageIntro } from "../components/PageIntro";
 import { Reveal } from "../components/Reveal";
 import { podcastEpisodes } from "../data/content";
@@ -16,7 +17,7 @@ export default function PodcastsPage() {
       <PageIntro
         index="01"
         eyebrow="Podcast"
-        title="Historias para escuchar."
+        title="Moda para escuchar."
         summary="Un recorrido sonoro por las personas, las ideas y los objetos que cambiaron nuestra manera de vestir."
         aside="Dirigido y producido por Carlos Sánchez de Medina y Pedro Jesús Gómez Pérez."
       />
@@ -36,7 +37,7 @@ export default function PodcastsPage() {
               target="_blank"
               rel="noreferrer"
             >
-              Spotify <span aria-hidden="true">↗</span>
+              Spotify
             </a>
             <a
               className="text-link"
@@ -44,7 +45,7 @@ export default function PodcastsPage() {
               target="_blank"
               rel="noreferrer"
             >
-              iVoox <span aria-hidden="true">↗</span>
+              iVoox
             </a>
           </div>
         </div>
@@ -75,9 +76,9 @@ export default function PodcastsPage() {
           Una conversación sobre moda puede empezar en Balenciaga, atravesar una
           guillotina y terminar preguntándonos quién decide hoy lo que deseamos.
         </p>
-        <a className="text-link" href="/archivo#colaboraciones">
-          Podcasts invitados y entrevistas <span aria-hidden="true">↗</span>
-        </a>
+        <Link className="text-link" href="/archivo#colaboraciones">
+          Podcasts invitados y entrevistas
+        </Link>
       </section>
     </>
   );

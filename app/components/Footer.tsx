@@ -18,13 +18,19 @@ export function Footer() {
           target="_blank"
           rel="noreferrer"
         >
-          Instagram ↗
+          Instagram
+        </a>
+        <a
+          href="https://www.youtube.com/@Historia_de_la_moda"
+          target="_blank"
+          rel="noreferrer"
+        >
+          YouTube
         </a>
         <a href="/admin">Administración</a>
       </div>
       <div className="footer-legal">
         <span>© {new Date().getFullYear()} Historia de la Moda</span>
-        <span>Madrid, España</span>
       </div>
     </footer>
   );

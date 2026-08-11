@@ -57,9 +57,13 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     icons: {
-      icon: "/images/brand/logo-icon.png",
-      shortcut: "/images/brand/logo-icon.png",
-      apple: "/images/brand/logo-icon.png",
+      icon: {
+        url: "/images/brand/logo-icon.png?v=20260811",
+        type: "image/png",
+        sizes: "512x512",
+      },
+      shortcut: "/images/brand/logo-icon.png?v=20260811",
+      apple: "/images/brand/logo-icon.png?v=20260811",
     },
     robots: { index: true, follow: true },
     openGraph: {

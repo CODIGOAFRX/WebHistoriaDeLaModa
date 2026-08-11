@@ -35,14 +35,25 @@ test("server-renders the finished Historia de la Moda homepage", async () => {
   assert.match(html, /Historia de la Moda/i);
   assert.match(html, /La moda[\s\S]*tambi.n[\s\S]*se piensa/i);
   assert.match(html, /\+400\.000/);
-  assert.match(html, /\/images\/brand\/logo-icon\.png/);
+  assert.match(html, /Carlos S.nchez de Medina Alcina/i);
+  assert.match(html, /Historiador del arte e investigador/i);
+  assert.match(html, /Granada[^<]*2026/i);
+  assert.match(html, /\/images\/brand\/logo-wordmark-white\.png/);
+  assert.match(html, /\/images\/brand\/logo-icon\.png\?v=20260811/);
+  for (const network of ["Instagram", "TikTok", "YouTube", "LinkedIn", "Spotify", "iVoox"]) {
+    assert.match(html, new RegExp(`>${network}<`, "i"), network);
+  }
   assert.match(html, /http:\/\/localhost\/og\.png/);
+  assert.doesNotMatch(
+    html,
+    /doctorando|licenciado|Madrid|Rigor sin distancia|Una imagen, una puerta|Conversaci.n abierta|\u2197/i,
+  );
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Building your site/i);
 });
 
 test("renders all primary public routes", async () => {
   const expectations = [
-    ["/podcasts", /Historias para escuchar/i],
+    ["/podcasts", /Moda para escuchar/i],
     ["/conferencias", /Pensar en voz alta/i],
     ["/biblioteca", /Leer para mirar mejor/i],
     ["/escuela", /Aprender a mirar/i],
@@ -53,6 +64,17 @@ test("renders all primary public routes", async () => {
     const response = await render(pathname);
     assert.equal(response.status, 200, pathname);
     assert.match(await response.text(), heading, pathname);
+  }
+});
+
+test("keeps the requested editorial removals out of every public route", async () => {
+  const forbidden =
+    /Una buena conferencia|Cada publicaci.n empieza|Aprender a leer una silueta|Los mejores vestidos de la historia del cine|La historia del abanico|Historias para escuchar|\u2197/i;
+
+  for (const pathname of ["/", "/podcasts", "/conferencias", "/biblioteca", "/escuela", "/archivo"]) {
+    const response = await render(pathname);
+    assert.equal(response.status, 200, pathname);
+    assert.doesNotMatch(await response.text(), forbidden, pathname);
   }
 });
 

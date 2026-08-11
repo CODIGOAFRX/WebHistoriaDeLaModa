@@ -1,20 +1,13 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import Link from "next/link";
-import {
-  chatGPTSignOutPath,
-  getChatGPTUser,
-  requireChatGPTUser,
-} from "@/app/chatgpt-auth";
+import { redirect } from "next/navigation";
 import {
   FALLBACK_BOOKS,
   FALLBACK_COURSES,
   getAdminContent,
-  isAdminEmailAllowed,
-  isLocalhostHost,
 } from "@/db/content";
 import { AdminStudio } from "./AdminStudio";
-import styles from "./admin.module.css";
+import { getAdminSessionFromCookieHeader } from "./auth";
 
 export const metadata: Metadata = {
   title: "Administración",
@@ -26,29 +19,11 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   const requestHeaders = await headers();
-  const localQa = isLocalhostHost(requestHeaders.get("host"));
-  let user = await getChatGPTUser();
+  const session = await getAdminSessionFromCookieHeader(
+    requestHeaders.get("cookie"),
+  );
 
-  if (!localQa && !user) {
-    user = await requireChatGPTUser("/admin");
-  }
-
-  if (!localQa && user && !isAdminEmailAllowed(user.email)) {
-    return (
-      <section className={styles.accessPage} aria-labelledby="access-title">
-        <p className={styles.eyebrow}>Acceso restringido</p>
-        <h1 id="access-title">Esta cuenta no puede abrir el estudio.</h1>
-        <p>
-          Has iniciado sesión como <strong>{user.email}</strong>, pero el correo no
-          figura en la lista de administradores.
-        </p>
-        <div className={styles.accessActions}>
-          <a href={chatGPTSignOutPath("/admin")}>Cambiar de cuenta</a>
-          <Link href="/">Volver a la web</Link>
-        </div>
-      </section>
-    );
-  }
+  if (!session) redirect("/admin/login");
 
   let books = FALLBACK_BOOKS.map((book) => ({ ...book }));
   let courses = FALLBACK_COURSES.map((course) => ({ ...course }));
@@ -63,7 +38,7 @@ export default async function AdminPage() {
     storageAvailable = true;
     storageMessage = "";
   } catch {
-    // The public fallback keeps localhost QA usable until D1 is configured.
+    // The read-only fallback keeps the studio visible until D1 is configured.
   }
 
   return (
@@ -73,11 +48,11 @@ export default async function AdminPage() {
       storageAvailable={storageAvailable}
       storageMessage={storageMessage}
       viewer={{
-        displayName: user?.displayName ?? "QA local",
-        email: user?.email ?? "localhost",
+        displayName: session.username,
+        email: "Sesión temporal protegida",
       }}
-      localQa={localQa}
-      signOutUrl={user ? chatGPTSignOutPath("/") : undefined}
+      localQa={false}
+      signOutUrl="/admin/logout"
     />
   );
 }

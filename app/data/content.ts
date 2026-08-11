@@ -105,16 +105,26 @@ export type Conference = {
   context: string;
   duration: string;
   year: string;
-  videoId: string;
+  videoId?: string;
+  href?: string;
+  featured?: boolean;
 };
 
 export const conferences: Conference[] = [
+  {
+    title: "La historia de la moda en 10 vestidos",
+    context: "5 MAM Fashion Forum · Museo del Automóvil y la Moda de Málaga",
+    duration: "16 de abril",
+    year: "2026",
+    href: "https://museoautomovilmoda.com/mes-de-la-moda-5mff/",
+  },
   {
     title: "La historia de la moda en 10 vestidos",
     context: "Museo del Automóvil y la Moda de Málaga",
     duration: "Masterclass",
     year: "2024",
     videoId: "KhFMU8wAqEI",
+    featured: true,
   },
   {
     title: "De Bronzino a Madrazo",
@@ -122,6 +132,13 @@ export const conferences: Conference[] = [
     duration: "45 min",
     year: "2021",
     videoId: "AN1LkIq0SAA",
+  },
+  {
+    title: "Del museo al escaparate",
+    context: "Arte y moda",
+    duration: "75 min",
+    year: "2020",
+    videoId: "yYdjksM6WwI",
   },
   {
     title: "Mariano Fortuny",
@@ -136,27 +153,6 @@ export const conferences: Conference[] = [
     duration: "30 min",
     year: "2011",
     videoId: "54r-yw9Ghcs",
-  },
-  {
-    title: "Los mejores vestidos de la historia del cine",
-    context: "Conversación con Guillermo Balmori",
-    duration: "98 min",
-    year: "2021",
-    videoId: "zT_jaIGlUUY",
-  },
-  {
-    title: "Del museo al escaparate",
-    context: "Arte y moda",
-    duration: "75 min",
-    year: "2020",
-    videoId: "yYdjksM6WwI",
-  },
-  {
-    title: "La historia del abanico",
-    context: "Cultura material, símbolo y gesto",
-    duration: "53 min",
-    year: "2020",
-    videoId: "u38tO6nwv30",
   },
 ];
 

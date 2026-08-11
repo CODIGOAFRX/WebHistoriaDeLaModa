@@ -10,7 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default function ConferencesPage() {
-  const [featured, ...archive] = conferences;
+  const featured = conferences.find((conference) => conference.featured) ?? conferences[0];
+  const archive = conferences.filter((conference) => conference !== featured);
+  const featuredHref = featured.videoId
+    ? `https://www.youtube.com/watch?v=${featured.videoId}`
+    : featured.href;
 
   return (
     <>
@@ -29,43 +33,39 @@ export default function ConferencesPage() {
           <p>{featured.context}</p>
           <div className="conference-feature-meta">
             <span>{featured.duration}</span>
-            <a
-              className="text-link"
-              href={`https://www.youtube.com/watch?v=${featured.videoId}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Abrir en YouTube <span aria-hidden="true">↗</span>
-            </a>
+            {featuredHref ? (
+              <a
+                className="text-link"
+                href={featuredHref}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Abrir en YouTube
+              </a>
+            ) : null}
           </div>
         </div>
 
         <Reveal className="video-frame" delay={80}>
-          <iframe
-            title={featured.title}
-            src={`https://www.youtube-nocookie.com/embed/${featured.videoId}?rel=0`}
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
+          {featured.videoId ? (
+            <iframe
+              title={featured.title}
+              src={`https://www.youtube-nocookie.com/embed/${featured.videoId}?rel=0`}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          ) : null}
         </Reveal>
       </section>
 
-      <section className="conference-manifesto">
-        <div className="shell conference-manifesto-grid">
-          <p className="eyebrow">El aula como espacio vivo</p>
-          <p>
-            Una buena conferencia no entrega una lista de fechas. Construye relaciones:
-            entre una pintura y un patrón, entre una idea política y una silueta, entre
-            el archivo y la calle.
-          </p>
-          <img
-            src="/images/media/carlos-conference.webp"
-            alt="Carlos Sánchez de Medina impartiendo una conferencia"
-            loading="lazy"
-          />
-        </div>
-      </section>
+      <div className="shell section-pad-sm">
+        <div
+          className="section-rule"
+          role="separator"
+          aria-label="Archivo audiovisual de conferencias"
+        />
+      </div>
 
       <section className="conference-archive shell section-pad">
         <div className="conference-archive-heading">
@@ -77,27 +77,56 @@ export default function ConferencesPage() {
             target="_blank"
             rel="noreferrer"
           >
-            Canal completo <span aria-hidden="true">↗</span>
+            Canal completo
           </a>
         </div>
 
         <div className="conference-grid">
           {archive.map((conference, index) => (
-            <Reveal as="article" className="conference-card" key={conference.videoId} delay={(index % 2) * 80}>
-              <div className="conference-video">
-                <iframe
-                  title={conference.title}
-                  src={`https://www.youtube-nocookie.com/embed/${conference.videoId}?rel=0`}
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              </div>
+            <Reveal
+              as="article"
+              className="conference-card"
+              key={`${conference.year}-${conference.title}`}
+              delay={(index % 2) * 80}
+            >
+              {conference.videoId ? (
+                <div className="conference-video">
+                  <iframe
+                    title={conference.title}
+                    src={`https://www.youtube-nocookie.com/embed/${conference.videoId}?rel=0`}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              ) : conference.href ? (
+                <a
+                  className="conference-video"
+                  href={conference.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Abrir la ficha oficial de ${conference.title}, ${conference.year}`}
+                >
+                  <img
+                    src="/images/media/carlos-conference.webp"
+                    alt="Carlos Sánchez de Medina impartiendo una conferencia"
+                    loading="lazy"
+                  />
+                </a>
+              ) : null}
               <div className="conference-card-meta">
-                <span>{String(index + 2).padStart(2, "0")}</span>
+                <span>{String(index + 1).padStart(2, "0")}</span>
                 <span>{conference.duration}</span>
               </div>
-              <h3>{conference.title}</h3>
+              <h3>
+                {conference.href && !conference.videoId ? (
+                  <a href={conference.href} target="_blank" rel="noreferrer">
+                    {conference.title}
+                  </a>
+                ) : (
+                  conference.title
+                )}
+              </h3>
               <p>{conference.context}</p>
             </Reveal>
           ))}
@@ -116,7 +145,7 @@ export default function ConferencesPage() {
             className="button-link is-light"
             href="mailto:demedinamoda@gmail.com?subject=Propuesta%20de%20conferencia"
           >
-            Proponer una conferencia <span aria-hidden="true">↗</span>
+            Proponer una conferencia
           </a>
         </div>
       </section>

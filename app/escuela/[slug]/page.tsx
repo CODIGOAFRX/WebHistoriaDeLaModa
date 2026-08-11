@@ -31,7 +31,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
           <h1>{course.title}</h1>
         </div>
         <Link className="text-link" href="/escuela">
-          Volver al aula <span aria-hidden="true">↗</span>
+          Volver al aula
         </Link>
       </div>
 

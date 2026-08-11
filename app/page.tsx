@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "./components/Reveal";
 import { SectionHeading } from "./components/SectionHeading";
+import { SocialLinks } from "./components/SocialLinks";
 
 export const metadata: Metadata = {
   title: "Historia, cultura y pensamiento",
@@ -43,12 +44,24 @@ const paths = [
   },
 ];
 
+const institutions = [
+  "Estación Diseño",
+  "ESCO · Campus Europeo de Estudios Superiores",
+  "Escuela Arte Granada",
+  "ELLE Education · Universidad Camilo José Cela",
+  "Cámara de Comercio de Granada",
+  "Universidad de Almería · Escuela de Arte de Almería",
+  "Universidad de Málaga · Museo del Automóvil y la Moda",
+  "Universidad de Extremadura",
+  "UPAEP",
+];
+
 export default function Home() {
   return (
     <>
       <section className="home-hero shell hero-entrance" aria-labelledby="home-title">
         <div className="home-hero-copy">
-          <p className="eyebrow">Carlos Sánchez de Medina Alcina</p>
+          <p className="eyebrow home-hero-name">Carlos Sánchez de Medina Alcina</p>
           <h1 id="home-title">
             <span>La moda</span>
             <span>también</span>
@@ -67,7 +80,7 @@ export default function Home() {
               target="_blank"
               rel="noreferrer"
             >
-              @historia_de_la_moda <span aria-hidden="true">↗</span>
+              @historia_de_la_moda
             </a>
           </div>
         </div>
@@ -82,7 +95,7 @@ export default function Home() {
           />
           <figcaption>
             <span>Historiador especializado en indumentaria y moda</span>
-            <span>Madrid · 2026</span>
+            <span>Granada · 2026</span>
           </figcaption>
         </figure>
 
@@ -93,7 +106,7 @@ export default function Home() {
 
       <div className="discipline-strip" aria-label="Áreas de trabajo">
         <div>
-          {[...disciplines, ...disciplines].map((item, index) => (
+          {[...disciplines, ...disciplines, ...disciplines, ...disciplines].map((item, index) => (
             <span key={`${item}-${index}`}>
               {item} <i aria-hidden="true">✦</i>
             </span>
@@ -122,8 +135,8 @@ export default function Home() {
 
           <Reveal className="about-copy" delay={80}>
             <p className="about-lead">
-              Licenciado y doctorando en Historia del Arte, Carlos Sánchez de Medina
-              Alcina investiga la indumentaria y la moda como documentos culturales.
+              Historiador del arte e investigador, Carlos Sánchez de Medina Alcina
+              estudia la indumentaria y la moda como documentos culturales.
             </p>
             <div className="about-columns">
               <p>
@@ -137,11 +150,30 @@ export default function Home() {
                 solamente una prenda.
               </p>
             </div>
-            <a className="text-link" href="/archivo">
-              Recorrer su trayectoria <span aria-hidden="true">↗</span>
-            </a>
+            <a className="text-link" href="/archivo">Recorrer su trayectoria</a>
           </Reveal>
         </div>
+
+        <section className="home-institutions" aria-labelledby="institutions-title">
+          <Reveal>
+            <div className="home-institutions-heading">
+              <p className="eyebrow">Aulas y conferencias</p>
+              <h2 id="institutions-title">Instituciones donde ha compartido conocimiento.</h2>
+              <p>
+                Una selección de escuelas, universidades y entidades en las que Carlos ha
+                desarrollado labores de docencia, dirección académica, formación o divulgación.
+              </p>
+            </div>
+            <ol className="institution-list">
+              {institutions.map((institution, index) => (
+                <li key={institution}>
+                  <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{institution}</strong>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
+        </section>
       </section>
 
       <section className="impact-section">
@@ -159,32 +191,13 @@ export default function Home() {
             <span>personas siguen el proyecto en Instagram</span>
           </Reveal>
 
-          <div className="impact-cards">
-            <Reveal as="article" className="impact-card" delay={0}>
-              <span>01</span>
-              <h3>Rigor sin distancia</h3>
-              <p>Historia del arte contada con precisión, claridad y sentido del humor.</p>
-            </Reveal>
-            <Reveal as="article" className="impact-card" delay={70}>
-              <span>02</span>
-              <h3>Una imagen, una puerta</h3>
-              <p>Cada publicación empieza en lo visual y conduce hacia una época completa.</p>
-            </Reveal>
-            <Reveal as="article" className="impact-card" delay={140}>
-              <span>03</span>
-              <h3>Conversación abierta</h3>
-              <p>Una comunidad que pregunta, comparte referencias y vuelve a mirar.</p>
-            </Reveal>
+          <div className="social-presence" aria-labelledby="social-presence-title">
+            <div className="social-presence-heading">
+              <p className="eyebrow">También puedes encontrarme aquí</p>
+              <h2 id="social-presence-title">Historia de la Moda en todos sus formatos.</h2>
+            </div>
+            <SocialLinks />
           </div>
-
-          <a
-            className="button-link"
-            href="https://www.instagram.com/historia_de_la_moda/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Seguir en Instagram <span aria-hidden="true">↗</span>
-          </a>
         </div>
       </section>
 
@@ -208,7 +221,6 @@ export default function Home() {
                 </div>
                 <h3>{path.title}</h3>
                 <p>{path.text}</p>
-                <span className="path-arrow" aria-hidden="true">↗</span>
               </a>
             </Reveal>
           ))}
@@ -239,9 +251,7 @@ export default function Home() {
               <span>Temas de Hoy</span>
               <span>Grupo Planeta</span>
             </div>
-            <a className="button-link" href="/biblioteca#libro">
-              Descubrir el proyecto <span aria-hidden="true">↗</span>
-            </a>
+            <a className="button-link" href="/biblioteca#libro">Descubrir el proyecto</a>
           </Reveal>
         </div>
       </section>
@@ -268,7 +278,7 @@ export default function Home() {
               <div className="featured-story-copy">
                 <p className="eyebrow">Aparición destacada</p>
                 <h3>La historia se entiende mejor cuando podemos verla.</h3>
-                <span className="text-link">Ir al archivo <b aria-hidden="true">↗</b></span>
+                <span className="text-link">Ir al archivo</span>
               </div>
             </a>
           </Reveal>
@@ -302,9 +312,7 @@ export default function Home() {
             Una escuela online en construcción para estudiar la moda con contexto,
             método y una buena historia detrás.
           </p>
-          <Link className="button-link is-light" href="/escuela">
-            Conocer el aula <span aria-hidden="true">↗</span>
-          </Link>
+          <Link className="button-link is-light" href="/escuela">Conocer el aula</Link>
         </Reveal>
       </section>
     </>

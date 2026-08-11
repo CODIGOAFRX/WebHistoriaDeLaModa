@@ -23,19 +23,20 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="site-header">
+    <header className="site-header site-header--dark">
       <Link
         className="brand"
         href="/"
         aria-label="Historia de la Moda, inicio"
         onClick={() => setOpen(false)}
       >
-        <img src="/images/brand/logo-wordmark.png" alt="Historia de la Moda" />
+        <img src="/images/brand/logo-wordmark-white.png" alt="Historia de la Moda" />
       </Link>
 
       <button
         className="menu-toggle"
         type="button"
+        aria-label={open ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={open}
         aria-controls="site-navigation"
         onClick={() => setOpen((value) => !value)}
@@ -74,7 +75,7 @@ export function SiteHeader() {
           target="_blank"
           rel="noreferrer"
         >
-          Instagram <span aria-hidden="true">↗</span>
+          Instagram
         </a>
       </nav>
     </header>

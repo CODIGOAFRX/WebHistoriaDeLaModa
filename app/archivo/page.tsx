@@ -9,31 +9,46 @@ export const metadata: Metadata = {
     "Archivo de medios, entrevistas, publicaciones, colaboraciones y trayectoria académica de Carlos Sánchez de Medina.",
 };
 
-const timeline = [
+const institutions = [
   {
-    years: "2006—2011",
-    role: "Coordinación académica y docencia",
-    place: "Escuela Arte Granada",
-  },
-  {
-    years: "2011—2020",
-    role: "Fundador, gerente y director académico",
     place: "Estación Diseño",
+    role: "Fundador, dirección académica, jefatura de estudios y docencia",
   },
   {
-    years: "2021—2022",
-    role: "Director académico de grados universitarios",
+    place: "Escuela Arte Granada",
+    role: "Coordinación académica y docencia",
+  },
+  {
     place: "ESCO · Campus Europeo de Estudios Superiores",
+    role: "Dirección académica de grados universitarios y docencia",
   },
   {
-    years: "2022—2024",
-    role: "Jefe de Estudios y docente",
-    place: "Estación Diseño · Escuela Superior de Diseño",
+    place: "ELLE Education · Universidad Camilo José Cela",
+    role: "Docencia en Historia de la Moda",
   },
   {
-    years: "2006—Hoy",
-    role: "Docencia, dirección académica y divulgación",
-    place: "Historia del arte, diseño, indumentaria y moda",
+    place: "Cámara de Comercio de Granada",
+    role: "Docencia en Historia del Lujo",
+  },
+  {
+    place: "Universidad de Almería · Escuela de Arte de Almería",
+    role: "Conferencia sobre indumentaria y pintura",
+  },
+  {
+    place: "Universidad de Málaga · Creative Lab",
+    role: "Conferencias sobre diseño e indumentaria",
+  },
+  {
+    place: "Universidad de Extremadura",
+    role: "Docencia y conferencias sobre creatividad y proyectos",
+  },
+  {
+    place: "UPAEP · Puebla, México",
+    role: "Conferencia sobre arte y moda",
+  },
+  {
+    place: "Museo del Automóvil y la Moda de Málaga",
+    role: "Masterclasses de Historia de la Moda",
   },
 ];
 
@@ -146,7 +161,6 @@ export default function ArchivePage() {
                 </div>
                 <p className="eyebrow">{item.outlet}</p>
                 <h3>{item.title}</h3>
-                <span className="media-open" aria-hidden="true">↗</span>
               </a>
             </Reveal>
           ))}
@@ -158,18 +172,17 @@ export default function ArchivePage() {
           <div className="trajectory-heading">
             <p className="eyebrow">Trayectoria académica</p>
             <p>
-              Licenciado y doctorando en Historia del Arte, diseñador gráfico y
-              docente desde 2006. La práctica de Carlos une dirección académica,
-              cultura visual y educación superior.
+              Historiador del arte e investigador, Carlos desarrolla su práctica entre
+              la docencia, la dirección académica, la cultura visual y la divulgación.
             </p>
           </div>
 
           <div className="timeline-list">
-            {timeline.map((entry, index) => (
-              <Reveal className="timeline-entry" key={`${entry.years}-${entry.place}`} delay={index * 45}>
-                <span>{entry.years}</span>
-                <h3>{entry.role}</h3>
-                <p>{entry.place}</p>
+            {institutions.map((entry, index) => (
+              <Reveal className="timeline-entry" key={entry.place} delay={(index % 4) * 45}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <h3>{entry.place}</h3>
+                <p>{entry.role}</p>
               </Reveal>
             ))}
           </div>
@@ -200,7 +213,6 @@ export default function ArchivePage() {
                   <h3>{item.title}</h3>
                 </div>
                 <span>{item.year}</span>
-                <b aria-hidden="true">↗</b>
               </a>
             </Reveal>
           ))}
@@ -233,7 +245,6 @@ export default function ArchivePage() {
                       <span>{String(itemIndex + 1).padStart(2, "0")}</span>
                       <span>{label}</span>
                       <span>{new URL(href).hostname.replace("www.", "")}</span>
-                      <b aria-hidden="true">↗</b>
                     </a>
                   ))}
                 </div>

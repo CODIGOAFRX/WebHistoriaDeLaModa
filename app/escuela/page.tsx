@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getPublicCourses } from "../../db/content";
 import { PageIntro } from "../components/PageIntro";
 import { Reveal } from "../components/Reveal";
@@ -122,15 +123,15 @@ export default async function SchoolPage() {
                   <h3>{course.title}</h3>
                   <p>{course.description}</p>
                   {course.scormUrl ? (
-                    <a className="button-link" href={`/escuela/${course.slug}`}>
-                      Entrar al aula <span aria-hidden="true">↗</span>
-                    </a>
+                    <Link className="button-link" href={`/escuela/${course.slug}`}>
+                      Entrar al aula
+                    </Link>
                   ) : (
                     <a
                       className="text-link"
                       href={`mailto:demedinamoda@gmail.com?subject=${encodeURIComponent(`Lista de espera: ${course.title}`)}`}
                     >
-                      Apuntarme a la lista <span aria-hidden="true">↗</span>
+                      Apuntarme a la lista
                     </a>
                   )}
                 </div>
@@ -157,7 +158,7 @@ export default async function SchoolPage() {
           <div className="scorm-window" aria-hidden="true">
             <div><span /><span /><span /></div>
             <p>Lección 01</p>
-            <strong>Aprender a leer una silueta</strong>
+            <strong>Historia de la moda</strong>
             <span>Progreso · 00%</span>
           </div>
         </div>

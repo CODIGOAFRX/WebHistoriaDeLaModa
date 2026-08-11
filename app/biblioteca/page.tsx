@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getPublicBooks } from "../../db/content";
 import { PageIntro } from "../components/PageIntro";
 import { Reveal } from "../components/Reveal";
@@ -61,7 +62,7 @@ export default async function LibraryPage() {
             className="button-link"
             href="mailto:demedinamoda@gmail.com?subject=Lista%20de%20espera%20%C2%BFC%C3%B3mo%20reconocer%20un%20Chanel%3F"
           >
-            Avísame cuando esté disponible <span aria-hidden="true">↗</span>
+            Avísame cuando esté disponible
           </a>
         </div>
 
@@ -92,14 +93,14 @@ export default async function LibraryPage() {
       </section>
 
       <section className="library-coda shell section-pad-sm">
-        <p className="eyebrow">Una nota al margen</p>
-        <blockquote>
-          “Cada publicación empieza mucho antes de abrir Instagram: empieza subrayando,
-          comparando y volviendo a mirar.”
-        </blockquote>
-        <a className="text-link" href="/archivo">
-          Publicaciones y fuentes <span aria-hidden="true">↗</span>
-        </a>
+        <div
+          className="section-rule"
+          role="separator"
+          aria-label="Biblioteca y archivo"
+        />
+        <Link className="text-link" href="/archivo">
+          Publicaciones y fuentes
+        </Link>
       </section>
     </>
   );

@@ -1,11 +1,9 @@
-import { chatGPTSignInPath, getChatGPTUser } from "@/app/chatgpt-auth";
+import { getAdminSessionFromCookieHeader } from "@/app/admin/auth";
 import {
   ContentStorageUnavailableError,
   createContent,
   deleteContent,
   getAdminContent,
-  isAdminEmailAllowed,
-  isLocalhostHost,
   updateContent,
   type ContentInput,
   type ContentKind,
@@ -121,29 +119,18 @@ export async function DELETE(request: Request) {
 }
 
 async function authorizeAdmin(request: Request): Promise<AuthorizationResult> {
-  const localQa = isLocalhostHost(new URL(request.url).host);
-  if (localQa) return { allowed: true };
-
-  const user = await getChatGPTUser();
-  if (!user) {
+  const session = await getAdminSessionFromCookieHeader(
+    request.headers.get("cookie"),
+  );
+  if (!session) {
     return {
       allowed: false,
       response: Response.json(
         {
-          error: "Debes iniciar sesión con ChatGPT para administrar el contenido.",
-          signInUrl: chatGPTSignInPath("/admin"),
+          error: "Debes iniciar sesión para administrar el contenido.",
+          signInUrl: "/admin/login",
         },
-        { status: 401 },
-      ),
-    };
-  }
-
-  if (!isAdminEmailAllowed(user.email)) {
-    return {
-      allowed: false,
-      response: Response.json(
-        { error: "Tu cuenta no está autorizada para esta administración." },
-        { status: 403 },
+        { status: 401, headers: { "Cache-Control": "no-store" } },
       ),
     };
   }

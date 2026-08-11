@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type SectionHeadingProps = {
   eyebrow: string;
   title: string;
@@ -12,9 +14,9 @@ export function SectionHeading({ eyebrow, title, text, action }: SectionHeadingP
       <h2>{title}</h2>
       {text ? <p>{text}</p> : null}
       {action ? (
-        <a className="text-link" href={action.href}>
-          {action.label} <span aria-hidden="true">↗</span>
-        </a>
+        <Link className="text-link" href={action.href}>
+          {action.label}
+        </Link>
       ) : null}
     </div>
   );
