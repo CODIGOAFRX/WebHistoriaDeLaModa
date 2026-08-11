@@ -56,15 +56,6 @@ export async function generateMetadata(): Promise<Metadata> {
       template: "%s — Historia de la Moda",
     },
     description,
-    icons: {
-      icon: {
-        url: "/images/brand/logo-icon.png?v=20260811",
-        type: "image/png",
-        sizes: "512x512",
-      },
-      shortcut: "/images/brand/logo-icon.png?v=20260811",
-      apple: "/images/brand/logo-icon.png?v=20260811",
-    },
     robots: { index: true, follow: true },
     openGraph: {
       title: "Historia de la Moda — Carlos Sánchez de Medina",

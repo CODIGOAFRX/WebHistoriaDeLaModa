@@ -11,6 +11,7 @@ const navigation = [
   { href: "/biblioteca", label: "Biblioteca" },
   { href: "/escuela", label: "Aula" },
   { href: "/archivo", label: "Archivo" },
+  { href: "/contacto", label: "Contacto" },
 ];
 
 export function SiteHeader() {

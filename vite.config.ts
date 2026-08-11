@@ -31,6 +31,13 @@ const localBindingConfig = {
         },
       ]
     : [],
+  ratelimits: [
+    {
+      name: "CONTACT_RATE_LIMITER",
+      namespace_id: "8112026",
+      simple: { limit: 3, period: 60 as const },
+    },
+  ],
 };
 
 export default defineConfig(async () => {

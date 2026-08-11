@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Footer() {
   return (
     <footer className="site-footer">
@@ -12,7 +14,7 @@ export function Footer() {
         </p>
       </div>
       <div className="footer-links">
-        <a href="mailto:demedinamoda@gmail.com">Contacto</a>
+        <Link href="/contacto">Contacto</Link>
         <a
           href="https://www.instagram.com/historia_de_la_moda/"
           target="_blank"
@@ -27,7 +29,7 @@ export function Footer() {
         >
           YouTube
         </a>
-        <a href="/admin">Administración</a>
+        <Link href="/admin">Administración</Link>
       </div>
       <div className="footer-legal">
         <span>© {new Date().getFullYear()} Historia de la Moda</span>

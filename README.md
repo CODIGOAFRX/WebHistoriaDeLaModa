@@ -33,6 +33,9 @@ npm run lint
 - `ADMIN_USERNAME`, `ADMIN_PASSWORD` y `ADMIN_SESSION_SECRET` permiten
   sustituirlas sin tocar el código.
 - Los cursos admiten una URL de lanzamiento SCORM, que se abre dentro del aula.
+- `/contacto` ofrece un formulario con validación y entrega mediante la API de
+  Resend. Configura `RESEND_API_KEY`, `CONTACT_FROM_EMAIL` y, si se desea,
+  `CONTACT_TO_EMAIL`; el remitente debe pertenecer a un dominio verificado.
 
 Para una instalación local, copia `.env.example` como `.env.local` y ajusta las
 credenciales. El acceso `admin` / `admin` es deliberadamente provisional e

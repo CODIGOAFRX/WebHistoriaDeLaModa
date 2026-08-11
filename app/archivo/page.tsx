@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageIntro } from "../components/PageIntro";
 import { Reveal } from "../components/Reveal";
-import { collaborations, mediaAppearances } from "../data/content";
+import { collaborations } from "../data/content";
 
 export const metadata: Metadata = {
   title: "Archivo y trayectoria",
@@ -9,46 +9,110 @@ export const metadata: Metadata = {
     "Archivo de medios, entrevistas, publicaciones, colaboraciones y trayectoria académica de Carlos Sánchez de Medina.",
 };
 
+const featuredMedia = [
+  {
+    outlet: "RTVE Play · La 2",
+    title: "Geópolis: la geopolítica de la cosmética",
+    year: "2024",
+    kind: "Televisión",
+    href: "https://www.rtve.es/play/videos/geopolis/la-geopolitica-de-la-cosmetica/16053311/",
+    image: "https://img.rtve.es/v/16053311/?w=1200",
+    imageAlt: "Miniatura oficial de La geopolítica de la cosmética, de Geópolis",
+    description:
+      "Carlos participa en el estreno del programa conducido por Silvia Intxaurrondo.",
+  },
+  {
+    outlet: "Canal Sur · Andalucía es moda",
+    title: "Historia de la Moda",
+    year: "2024–2025",
+    kind: "Serie · 12 capítulos",
+    href: "https://www.canalsur.es/television/andalucia-es-moda/",
+    image:
+      "https://static.canalsur.es/clip/eae0007c-845e-494f-94f7-0891c013e912_facebook-aspect-ratio_default_0.jpg",
+    imageAlt: "Imagen oficial del programa Andalucía es moda de Canal Sur",
+    description:
+      "Sección fija de Carlos dentro del programa presentado por Laura Sánchez. La serie reúne 12 capítulos; el archivo enlaza las 10 entregas verificadas.",
+  },
+  {
+    outlet: "Canal Sur · La Memoria",
+    title: "Indumentaria, moda, evolución y género",
+    year: "2023",
+    kind: "Entrevista",
+    href: "https://www.canalsurmas.es/videos/detail/76072-la-memoria-27052023",
+    image: "/images/media/carlos-la-memoria.jpg",
+    imageAlt: "Carlos Sánchez de Medina durante su entrevista en La Memoria de Canal Sur",
+    description:
+      "Una conversación sobre la dimensión cultural y social de aquello que vestimos.",
+  },
+  {
+    outlet: "Canal Sur · Andalucía es moda",
+    title: "La historia de Barbie, musa de los grandes diseñadores",
+    year: "2024",
+    kind: "Capítulo",
+    href: "https://www.canalsur.es/television/andalucia-es-moda/historia-barbie-musa-mejores-disenadores_1_1303458.html",
+    image:
+      "https://static.canalsur.es/clip/e7056805-521b-4314-8d09-e86ba3b00098_facebook-aspect-ratio_default_0.jpg",
+    imageAlt: "Miniatura oficial del capítulo sobre Barbie en Andalucía es moda",
+    description:
+      "Una de las entregas de la sección Historia de la Moda, disponible en Canal Sur.",
+  },
+] as const;
+
+const secondaryMedia = [
+  {
+    outlet: "La Vanguardia",
+    title: "Agonía y ocaso del zapato",
+    year: "2026",
+    href: "https://www.lavanguardia.com/vida/20260322/11495827/agonia-ocaso-zapato.html",
+  },
+  {
+    outlet: "El Confidencial · Pausa",
+    title: "Tacones, corsés y cómo vestiremos",
+    year: "2023",
+    href: "https://www.elconfidencial.com/espana/2023-09-28/pausa-podcast-tacones-corses-vestiremos_3743282/",
+  },
+] as const;
+
 const institutions = [
   {
-    place: "Estación Diseño",
+    place: "Estación Diseño · Escuela Superior de Diseño",
     role: "Fundador, dirección académica, jefatura de estudios y docencia",
-  },
-  {
-    place: "Escuela Arte Granada",
-    role: "Coordinación académica y docencia",
-  },
-  {
-    place: "ESCO · Campus Europeo de Estudios Superiores",
-    role: "Dirección académica de grados universitarios y docencia",
   },
   {
     place: "ELLE Education · Universidad Camilo José Cela",
     role: "Docencia en Historia de la Moda",
   },
   {
-    place: "Cámara de Comercio de Granada",
+    place: "ESCO · Escuela Superior de Comunicación y Marketing de Granada",
+    role: "Dirección académica de grados universitarios y docencia",
+  },
+  {
+    place: "Escuela de Dirección y Altos Estudios (EDIAE) · Cámara Granada",
     role: "Docencia en Historia del Lujo",
   },
   {
-    place: "Universidad de Almería · Escuela de Arte de Almería",
+    place: "Universidad de Almería",
     role: "Conferencia sobre indumentaria y pintura",
   },
   {
-    place: "Universidad de Málaga · Creative Lab",
+    place: "Escuela de Arte y Superior de Diseño Carlos Pérez Siquier · Almería",
+    role: "Conferencias sobre indumentaria, arte y cultura visual",
+  },
+  {
+    place: "Universidad de Málaga",
     role: "Conferencias sobre diseño e indumentaria",
+  },
+  {
+    place: "Museo Automovilístico y de la Moda de Málaga",
+    role: "Masterclasses de Historia de la Moda",
   },
   {
     place: "Universidad de Extremadura",
     role: "Docencia y conferencias sobre creatividad y proyectos",
   },
   {
-    place: "UPAEP · Puebla, México",
+    place: "UPAEP · Universidad Popular Autónoma del Estado de Puebla, México",
     role: "Conferencia sobre arte y moda",
-  },
-  {
-    place: "Museo del Automóvil y la Moda de Málaga",
-    role: "Masterclasses de Historia de la Moda",
   },
 ];
 
@@ -81,18 +145,18 @@ const fullArchive = [
     ],
   },
   {
-    title: "Historia de la Moda en Canal Sur",
+    title: "Historia de la Moda · Andalucía es moda · 10 capítulos disponibles",
     items: [
-      ["Programa 01", "https://www.youtube.com/watch?v=PAYH7oEPRLA"],
-      ["Programa 02", "https://www.youtube.com/watch?v=zxyUOM7M3pI"],
-      ["Programa 03", "https://www.youtube.com/watch?v=2ZbKxVa9soY"],
-      ["Programa 04", "https://www.youtube.com/watch?v=Ic2uyonDcB0"],
-      ["Programa 05", "https://www.youtube.com/watch?v=3L3J-PbCPA0"],
-      ["Programa 06", "https://www.youtube.com/watch?v=KatzvQxlBEs"],
-      ["Programa 07", "https://www.youtube.com/watch?v=iVBgxn7C1Pg"],
-      ["Programa 08", "https://www.youtube.com/watch?v=3DF7lCXymYQ"],
-      ["Programa 09", "https://www.youtube.com/watch?v=1bZeolL_RzE"],
-      ["Programa 10", "https://www.youtube.com/watch?v=WSHXL3skSPs"],
+      ["Mariano Fortuny", "https://www.youtube.com/watch?v=PAYH7oEPRLA"],
+      ["La moda transforma el cuerpo", "https://www.youtube.com/watch?v=zxyUOM7M3pI"],
+      ["Los vestidos joya", "https://www.youtube.com/watch?v=2ZbKxVa9soY"],
+      ["La historia de los trajes de novia", "https://www.youtube.com/watch?v=Ic2uyonDcB0"],
+      ["El color negro en la moda", "https://www.youtube.com/watch?v=3L3J-PbCPA0"],
+      ["Alta costura y prêt-à-porter", "https://www.youtube.com/watch?v=KatzvQxlBEs"],
+      ["El Museo del Automóvil y la Moda de Málaga", "https://www.youtube.com/watch?v=iVBgxn7C1Pg"],
+      ["Los ornamentos litúrgicos", "https://www.youtube.com/watch?v=3DF7lCXymYQ"],
+      ["La historia de Barbie", "https://www.youtube.com/watch?v=1bZeolL_RzE"],
+      ["La historia de los pantalones vaqueros", "https://www.youtube.com/watch?v=WSHXL3skSPs"],
     ],
   },
   {
@@ -112,6 +176,7 @@ const fullArchive = [
       ["El País ICON · Un hombre con abanico", "https://elpais.com/icon/2025-08-10/un-hombre-con-abanico-pierde-su-masculinidad-fragil-por-que-sigue-siendo-un-complemento-asociado-a-lo-femenino.html"],
       ["¡HOLA! Fashion · Estética flapper", "https://www.hola.com/fashion/tendencias/2022011272771/estetica-flapper-vestidos-flecos/"],
       ["El País S Moda · Ray-Ban Wayfarer", "https://elpais.com/smoda/moda/historia-ray-ban-wayfarer-disenador-invencion-20-grados-inclinacion.html"],
+      ["El Confidencial · Tacones, corsés y cómo vestiremos", "https://www.elconfidencial.com/espana/2023-09-28/pausa-podcast-tacones-corses-vestiremos_3743282/"],
       ["Glamour · Vestidos con volumen", "https://www.glamour.es/articulos/vestidos-volumen-falda-tendencia-cancan"],
       ["Clara · Letizia y doña Sofía", "https://www.clara.es/celebrities/asi-rompio-letizia-camino-impuesto-por-dona-sofia-hace-10-anos-su-golpe-efecto-proclamacion-felipe-vi_35781"],
       ["La Vanguardia · Agonía y ocaso del zapato", "https://www.lavanguardia.com/vida/20260322/11495827/agonia-ocaso-zapato.html"],
@@ -125,8 +190,6 @@ const fullArchive = [
 ];
 
 export default function ArchivePage() {
-  const featured = mediaAppearances.filter((item) => item.featured);
-
   return (
     <>
       <PageIntro
@@ -145,25 +208,36 @@ export default function ArchivePage() {
         </div>
 
         <div className="media-feature-grid">
-          {featured.map((item, index) => (
+          {featuredMedia.map((item, index) => (
             <Reveal as="article" className={`media-feature-card media-feature-card-${index + 1}`} key={item.href} delay={index * 60}>
               <a href={item.href} target="_blank" rel="noreferrer">
-                {index < 2 ? (
-                  <img
-                    src={index === 0 ? "/images/media/carlos-tv-detail.webp" : "/images/media/carlos-tv.webp"}
-                    alt=""
-                    loading="lazy"
-                  />
-                ) : null}
+                <img src={item.image} alt={item.imageAlt} loading="lazy" />
                 <div className="media-feature-meta">
                   <span>{item.kind}</span>
                   <span>{item.year}</span>
                 </div>
                 <p className="eyebrow">{item.outlet}</p>
                 <h3>{item.title}</h3>
+                <p className="media-feature-description">{item.description}</p>
               </a>
             </Reveal>
           ))}
+        </div>
+
+        <div className="media-secondary" aria-labelledby="secondary-media-title">
+          <div>
+            <p className="eyebrow">Prensa y audio</p>
+            <h3 id="secondary-media-title">Más apariciones.</h3>
+          </div>
+          <div className="media-secondary-links">
+            {secondaryMedia.map((item) => (
+              <a href={item.href} target="_blank" rel="noreferrer" key={item.href}>
+                <span>{item.outlet}</span>
+                <strong>{item.title}</strong>
+                <small>{item.year}</small>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 

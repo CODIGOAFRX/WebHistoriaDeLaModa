@@ -4,14 +4,19 @@ import test from "node:test";
 
 const templateRoot = new URL("../", import.meta.url);
 
-async function render(pathname = "/") {
+async function render(pathname = "/", init = {}) {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}-${pathname}`);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
     new Request(`http://localhost${pathname}`, {
-      headers: { accept: "text/html", host: "localhost" },
+      ...init,
+      headers: {
+        accept: "text/html",
+        host: "localhost",
+        ...(init.headers || {}),
+      },
     }),
     {
       ASSETS: {
@@ -39,9 +44,9 @@ test("server-renders the finished Historia de la Moda homepage", async () => {
   assert.match(html, /Historiador del arte e investigador/i);
   assert.match(html, /Granada[^<]*2026/i);
   assert.match(html, /\/images\/brand\/logo-wordmark-white\.png/);
-  assert.match(html, /\/images\/brand\/logo-icon\.png\?v=20260811/);
+  assert.match(html, /\/favicon\.ico/);
   for (const network of ["Instagram", "TikTok", "YouTube", "LinkedIn", "Spotify", "iVoox"]) {
-    assert.match(html, new RegExp(`>${network}<`, "i"), network);
+    assert.match(html, new RegExp(`aria-label="Abrir ${network}`, "i"), network);
   }
   assert.match(html, /http:\/\/localhost\/og\.png/);
   assert.doesNotMatch(
@@ -58,6 +63,7 @@ test("renders all primary public routes", async () => {
     ["/biblioteca", /Leer para mirar mejor/i],
     ["/escuela", /Aprender a mirar/i],
     ["/archivo", /Todo lo que deja huella/i],
+    ["/contacto", /Hablemos/i],
   ];
 
   for (const [pathname, heading] of expectations) {
@@ -71,15 +77,47 @@ test("keeps the requested editorial removals out of every public route", async (
   const forbidden =
     /Una buena conferencia|Cada publicaci.n empieza|Aprender a leer una silueta|Los mejores vestidos de la historia del cine|La historia del abanico|Historias para escuchar|\u2197/i;
 
-  for (const pathname of ["/", "/podcasts", "/conferencias", "/biblioteca", "/escuela", "/archivo"]) {
+  for (const pathname of ["/", "/podcasts", "/conferencias", "/biblioteca", "/escuela", "/archivo", "/contacto"]) {
     const response = await render(pathname);
     assert.equal(response.status, 200, pathname);
     assert.doesNotMatch(await response.text(), forbidden, pathname);
   }
 });
 
+test("contact endpoint validates requests and silently discards the honeypot", async () => {
+  const common = {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      origin: "http://localhost",
+    },
+  };
+  const invalid = await render("/api/contacto", {
+    ...common,
+    body: JSON.stringify({ name: "A", email: "incorrecto" }),
+  });
+  assert.equal(invalid.status, 400);
+
+  const honeypot = await render("/api/contacto", {
+    ...common,
+    body: JSON.stringify({
+      name: "Ana Pérez",
+      email: "ana@example.com",
+      organization: "Museo",
+      topic: "Otro",
+      message: "Este mensaje tiene la longitud mínima solicitada.",
+      website: "https://spam.example",
+      consent: true,
+    }),
+  });
+  assert.equal(honeypot.status, 202);
+});
+
 test("removes disposable starter assets and dependencies", async () => {
   const packageJson = await readFile(new URL("../package.json", import.meta.url), "utf8");
   assert.doesNotMatch(packageJson, /react-loading-skeleton|site-creator-vinext-starter/);
-  await assert.rejects(access(new URL("../app/_sites-preview", templateRoot)));
+  await assert.rejects(access(new URL("app/_sites-preview", templateRoot)));
+  await access(new URL("app/favicon.ico", templateRoot));
+  await access(new URL("app/icon.png", templateRoot));
 });

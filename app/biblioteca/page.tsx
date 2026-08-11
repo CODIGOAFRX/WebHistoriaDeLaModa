@@ -8,22 +8,58 @@ import { LibraryGrid, type LibraryBook } from "./LibraryGrid";
 export const metadata: Metadata = {
   title: "Biblioteca",
   description:
-    "La biblioteca de trabajo de Carlos Sánchez de Medina: libros comentados sobre arte, moda, indumentaria y cultura visual.",
+    "Recursos y lecturas de Historia de la Moda sobre arte, indumentaria y cultura visual.",
 };
 
 export const dynamic = "force-dynamic";
 
+const resources = [
+  {
+    title: "Biblioteca comentada",
+    description:
+      "Libros y fuentes seleccionados para continuar investigando cada tema.",
+    href: "#biblioteca",
+    label: "Lecturas",
+  },
+  {
+    title: "Archivo documental",
+    description:
+      "Entrevistas, publicaciones, prensa y materiales reunidos en un mismo índice.",
+    href: "/archivo",
+    label: "Documentación",
+  },
+  {
+    title: "Podcast",
+    description:
+      "Episodios para recorrer personas, objetos e ideas de la historia de la moda.",
+    href: "/podcasts",
+    label: "Audio",
+  },
+  {
+    title: "Conferencias",
+    description:
+      "Clases abiertas y encuentros audiovisuales ordenados para volver a ellos.",
+    href: "/conferencias",
+    label: "Vídeo",
+  },
+] as const;
+
 export default async function LibraryPage() {
   const rows = await getPublicBooks();
-  const books: LibraryBook[] = rows.map((book) => ({
-    id: book.id,
-    title: book.title,
-    author: book.author,
-    description: book.description,
-    category: book.category,
-    coverUrl: book.imageUrl,
-    featured: false,
-  }));
+  const books: LibraryBook[] = rows
+    .filter(
+      (book) =>
+        book.category.trim().toLocaleLowerCase("es") !== "próximamente",
+    )
+    .map((book) => ({
+      id: book.id,
+      title: book.title,
+      author: book.author,
+      description: book.description,
+      category: book.category,
+      coverUrl: book.imageUrl,
+      featured: false,
+    }));
 
   return (
     <>
@@ -31,66 +67,42 @@ export default async function LibraryPage() {
         index="03"
         eyebrow="Biblioteca"
         title="Leer para mirar mejor."
-        summary="Una colección comentada de las fuentes que sostienen el trabajo de Carlos: historia, teoría, cultura visual y biografías."
-        aside="Una biblioteca viva. Los títulos y comentarios se amplían desde el estudio de Carlos."
+        summary="Una colección comentada de fuentes y recursos sobre historia, teoría, cultura visual e indumentaria."
+        aside="Una biblioteca viva: los títulos y comentarios se amplían desde el estudio de Historia de la Moda."
       />
 
-      <section id="libro" className="upcoming-book shell section-pad">
-        <Reveal className="upcoming-book-cover">
-          <div className="upcoming-book-spine">Temas de Hoy · Grupo Planeta</div>
-          <div className="upcoming-book-face">
-            <p>Próximamente</p>
-            <h2 className="book-title-lines" aria-label="Cómo reconocer un Chanel">
-              <span aria-hidden="true">Cómo</span>
-              <span aria-hidden="true">reconocer</span>
-              <span aria-hidden="true">un</span>
-              <span aria-hidden="true">Chanel</span>
-            </h2>
-            <span>Carlos Sánchez de Medina</span>
-            <i aria-hidden="true">02</i>
-          </div>
-        </Reveal>
-
-        <div className="upcoming-book-copy">
-          <p className="eyebrow">El libro que viene</p>
-          <h2>Reconocer una casa es aprender a leer sus códigos.</h2>
+      <section className="library-resources shell section-pad" aria-labelledby="resources-title">
+        <div className="library-resources-heading">
+          <p className="eyebrow">Recursos</p>
+          <h2 id="resources-title">Distintas formas de seguir el hilo.</h2>
           <p>
-            Carlos está escribiendo una historia de la moda que parte de una pregunta
-            concreta: ¿qué vemos cuando decimos “esto es Chanel”? Un viaje por símbolos,
-            objetos, creadoras, mitos y transformaciones.
+            Lecturas, documentos, audio y vídeo organizados para consultar,
+            contrastar y continuar investigando.
           </p>
-          <p className="book-note">
-            Previsto con Temas de Hoy, sello editorial de Grupo Planeta. La fecha,
-            portada y preventa se anunciarán cuando exista la ficha editorial.
-          </p>
-          <a
-            className="button-link"
-            href="mailto:demedinamoda@gmail.com?subject=Lista%20de%20espera%20%C2%BFC%C3%B3mo%20reconocer%20un%20Chanel%3F"
-          >
-            Avísame cuando esté disponible
-          </a>
         </div>
 
-        <Reveal className="chanel-video" delay={90}>
-          <iframe
-            title="¿Cómo reconocer un Chanel?"
-            src="https://www.youtube-nocookie.com/embed/ryqmzyayQBE?rel=0"
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-          <p>Una primera pista audiovisual sobre los códigos de la casa.</p>
-        </Reveal>
+        <div className="library-resource-grid">
+          {resources.map((resource, index) => (
+            <Reveal as="article" className="library-resource-card" key={resource.href} delay={index * 45}>
+              <Link href={resource.href}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <p>{resource.label}</p>
+                <h3>{resource.title}</h3>
+                <p>{resource.description}</p>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
       </section>
 
-      <section className="library-section section-pad-sm">
+      <section id="biblioteca" className="library-section section-pad-sm">
         <div className="shell">
           <div className="library-heading">
             <p className="eyebrow">Estanterías de trabajo</p>
-            <h2>La biblioteca de Carlos.</h2>
+            <h2>La biblioteca de Historia de la Moda.</h2>
             <p>
-              No es una lista definitiva: es un mapa de lecturas en construcción,
-              pensado para volver a las fuentes y seguir investigando.
+              Un mapa de lecturas en construcción para volver a las fuentes y
+              seguir investigando.
             </p>
           </div>
           <LibraryGrid books={books} />

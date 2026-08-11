@@ -78,19 +78,19 @@ export function SocialLinks() {
               href={social.href}
               target="_blank"
               rel="noreferrer"
+              title={social.label}
               aria-label={`Abrir ${social.label} en una pestaña nueva`}
             >
               <SocialIcon name={social.icon} />
-              <span>{social.label}</span>
             </a>
           ) : (
             <span
               className="social-link-card is-pending"
               role="note"
+              title={`${social.label}: enlace oficial pendiente de confirmar`}
               aria-label={`${social.label}: enlace oficial pendiente de confirmar`}
             >
               <SocialIcon name={social.icon} />
-              <span>{social.label}</span>
               <small>Enlace pendiente</small>
             </span>
           )}

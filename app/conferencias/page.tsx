@@ -9,12 +9,52 @@ export const metadata: Metadata = {
     "Conferencias y clases magistrales de Carlos Sánchez de Medina sobre historia del arte, indumentaria y moda.",
 };
 
+const verifiedConferenceVideos: Record<
+  string,
+  { videoId: string; date: string; displayDate?: string; dateLabel?: string }
+> = {
+  "mam-2026": { videoId: "wUzjeWzRTWQ", date: "2026-04-16" },
+  KhFMU8wAqEI: { videoId: "KhFMU8wAqEI", date: "2024-05-16" },
+  AN1LkIq0SAA: {
+    videoId: "AN1LkIq0SAA",
+    date: "2024-08-05",
+    dateLabel: "Publicación",
+  },
+  yYdjksM6WwI: {
+    videoId: "yYdjksM6WwI",
+    date: "2024-07-15",
+    dateLabel: "Publicación",
+  },
+  fNpCVX9qdHU: { videoId: "fNpCVX9qdHU", date: "2018-11-27" },
+  "54r-yw9Ghcs": {
+    videoId: "54r-yw9Ghcs",
+    date: "2011-01-01",
+    displayDate: "2011",
+  },
+};
+
+function formatDate(date: string) {
+  const [year, month, day] = date.split("-");
+  return `${day}/${month}/${year}`;
+}
+
 export default function ConferencesPage() {
-  const featured = conferences.find((conference) => conference.featured) ?? conferences[0];
-  const archive = conferences.filter((conference) => conference !== featured);
-  const featuredHref = featured.videoId
-    ? `https://www.youtube.com/watch?v=${featured.videoId}`
-    : featured.href;
+  const conferenceVideos = conferences
+    .flatMap((conference) => {
+      const sourceKey = conference.year === "2026" && !conference.videoId
+        ? "mam-2026"
+        : conference.videoId;
+      const verifiedVideo = sourceKey
+        ? verifiedConferenceVideos[sourceKey]
+        : undefined;
+
+      return verifiedVideo
+        ? [{ ...conference, ...verifiedVideo }]
+        : [];
+    })
+    .sort((left, right) => right.date.localeCompare(left.date));
+  const [featured, ...archive] = conferenceVideos;
+  const featuredDate = formatDate(featured.date);
 
   return (
     <>
@@ -28,34 +68,32 @@ export default function ConferencesPage() {
 
       <section className="conference-feature shell section-pad">
         <div className="conference-feature-copy">
-          <p className="eyebrow">Conferencia destacada · {featured.year}</p>
+          <p className="eyebrow">Conferencia destacada</p>
           <h2>{featured.title}</h2>
           <p>{featured.context}</p>
           <div className="conference-feature-meta">
-            <span>{featured.duration}</span>
-            {featuredHref ? (
-              <a
-                className="text-link"
-                href={featuredHref}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Abrir en YouTube
-              </a>
-            ) : null}
+            <time dateTime={featured.date} aria-label={`Fecha: ${featuredDate}`}>
+              {featuredDate}
+            </time>
+            <a
+              className="text-link"
+              href={`https://www.youtube.com/watch?v=${featured.videoId}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Abrir en YouTube
+            </a>
           </div>
         </div>
 
         <Reveal className="video-frame" delay={80}>
-          {featured.videoId ? (
-            <iframe
-              title={featured.title}
-              src={`https://www.youtube-nocookie.com/embed/${featured.videoId}?rel=0`}
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
-          ) : null}
+          <iframe
+            title={featured.title}
+            src={`https://www.youtube-nocookie.com/embed/${featured.videoId}?rel=0`}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
         </Reveal>
       </section>
 
@@ -82,14 +120,16 @@ export default function ConferencesPage() {
         </div>
 
         <div className="conference-grid">
-          {archive.map((conference, index) => (
-            <Reveal
-              as="article"
-              className="conference-card"
-              key={`${conference.year}-${conference.title}`}
-              delay={(index % 2) * 80}
-            >
-              {conference.videoId ? (
+          {archive.map((conference, index) => {
+            const displayDate = conference.displayDate ?? formatDate(conference.date);
+
+            return (
+              <Reveal
+                as="article"
+                className="conference-card"
+                key={conference.videoId}
+                delay={(index % 2) * 80}
+              >
                 <div className="conference-video">
                   <iframe
                     title={conference.title}
@@ -99,37 +139,17 @@ export default function ConferencesPage() {
                     allowFullScreen
                   />
                 </div>
-              ) : conference.href ? (
-                <a
-                  className="conference-video"
-                  href={conference.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`Abrir la ficha oficial de ${conference.title}, ${conference.year}`}
-                >
-                  <img
-                    src="/images/media/carlos-conference.webp"
-                    alt="Carlos Sánchez de Medina impartiendo una conferencia"
-                    loading="lazy"
-                  />
-                </a>
-              ) : null}
-              <div className="conference-card-meta">
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <span>{conference.duration}</span>
-              </div>
-              <h3>
-                {conference.href && !conference.videoId ? (
-                  <a href={conference.href} target="_blank" rel="noreferrer">
-                    {conference.title}
-                  </a>
-                ) : (
-                  conference.title
-                )}
-              </h3>
-              <p>{conference.context}</p>
-            </Reveal>
-          ))}
+                <div className="conference-card-meta">
+                  <span>{conference.dateLabel ?? "Fecha"}</span>
+                  <time dateTime={conference.date} aria-label={`Fecha: ${displayDate}`}>
+                    {displayDate}
+                  </time>
+                </div>
+                <h3>{conference.title}</h3>
+                <p>{conference.context}</p>
+              </Reveal>
+            );
+          })}
         </div>
       </section>
 

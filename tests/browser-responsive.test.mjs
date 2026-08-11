@@ -29,6 +29,7 @@ const publicRoutes = [
   "/biblioteca",
   "/escuela",
   "/archivo",
+  "/contacto",
   "/admin/login",
 ];
 
@@ -492,5 +493,31 @@ test(
   } finally {
     await context.close();
   }
+  },
+);
+
+test(
+  "contact form is keyboard-labelled and enforces native validation",
+  { skip: Boolean(process.env.QA_ROUTE) },
+  async () => {
+    const viewport = viewports.find((candidate) => candidate.label === "mobile-small");
+    const context = await createContext(viewport);
+    const page = await context.newPage();
+    try {
+      await page.goto(`${baseUrl}/contacto`, { waitUntil: "domcontentloaded" });
+      await page.getByLabel("Nombre y apellidos").fill("Ana Pérez");
+      await page.getByLabel("Correo electrónico").fill("correo-inválido");
+      await page.getByLabel("Mensaje").fill("Mensaje suficientemente largo para validar el campo.");
+      await page.getByRole("checkbox").check();
+      await page.getByRole("button", { name: "Enviar mensaje" }).click();
+      assert.equal(
+        await page.getByLabel("Correo electrónico").evaluate((element) => element.matches(":invalid")),
+        true,
+      );
+      assert.equal(page.url(), `${baseUrl}/contacto`);
+      assert.equal(await page.locator(".contact-honeypot").isVisible(), false);
+    } finally {
+      await context.close();
+    }
   },
 );

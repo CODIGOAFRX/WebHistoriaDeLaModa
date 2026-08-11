@@ -60,7 +60,7 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
         </label>
       </div>
 
-      {visible.length ? (
+      {visible.length || placeholderCount ? (
         <div className="book-grid-public">
           {visible.map((book, index) => (
             <article className="book-card-public" key={book.id}>

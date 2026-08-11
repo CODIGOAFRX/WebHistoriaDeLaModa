@@ -45,15 +45,16 @@ const paths = [
 ];
 
 const institutions = [
-  "Estación Diseño",
-  "ESCO · Campus Europeo de Estudios Superiores",
-  "Escuela Arte Granada",
+  "Estación Diseño · Escuela Superior de Diseño",
   "ELLE Education · Universidad Camilo José Cela",
-  "Cámara de Comercio de Granada",
-  "Universidad de Almería · Escuela de Arte de Almería",
-  "Universidad de Málaga · Museo del Automóvil y la Moda",
+  "ESCO · Escuela Superior de Comunicación y Marketing de Granada",
+  "Escuela de Dirección y Altos Estudios (EDIAE) · Cámara Granada",
+  "Universidad de Almería",
+  "Escuela de Arte y Superior de Diseño Carlos Pérez Siquier · Almería",
+  "Universidad de Málaga",
+  "Museo Automovilístico y de la Moda de Málaga",
   "Universidad de Extremadura",
-  "UPAEP",
+  "UPAEP · Universidad Popular Autónoma del Estado de Puebla, México",
 ];
 
 export default function Home() {
@@ -114,12 +115,15 @@ export default function Home() {
         </div>
       </div>
 
-      <section id="historia" className="about-section shell section-pad">
-        <SectionHeading
-          eyebrow="Quién soy"
-          title="La historia detrás de cada prenda."
-          text="La moda no aparece de la nada. Es el resultado de ideas, poder, deseo, técnica y memoria. Carlos convierte ese entramado en relatos claros, rigurosos y fascinantes."
-        />
+      <section
+        id="historia"
+        className="about-section shell section-pad"
+        aria-labelledby="about-title"
+      >
+        <div className="about-intro">
+          <p className="eyebrow">Historiador del arte e investigador</p>
+          <h2 id="about-title">Carlos Sánchez de Medina Alcina</h2>
+        </div>
 
         <div className="about-grid">
           <Reveal className="about-image-wrap">
@@ -135,8 +139,8 @@ export default function Home() {
 
           <Reveal className="about-copy" delay={80}>
             <p className="about-lead">
-              Historiador del arte e investigador, Carlos Sánchez de Medina Alcina
-              estudia la indumentaria y la moda como documentos culturales.
+              Estudia la indumentaria y la moda como documentos culturales: expresiones
+              de su contexto histórico, artístico y social.
             </p>
             <div className="about-columns">
               <p>
@@ -157,11 +161,11 @@ export default function Home() {
         <section className="home-institutions" aria-labelledby="institutions-title">
           <Reveal>
             <div className="home-institutions-heading">
-              <p className="eyebrow">Aulas y conferencias</p>
-              <h2 id="institutions-title">Instituciones donde ha compartido conocimiento.</h2>
+              <p className="eyebrow">Trayectoria académica</p>
+              <h2 id="institutions-title">Docencia, investigación y divulgación.</h2>
               <p>
-                Una selección de escuelas, universidades y entidades en las que Carlos ha
-                desarrollado labores de docencia, dirección académica, formación o divulgación.
+                Selección de universidades, escuelas superiores y entidades culturales en
+                las que ha desarrollado actividad docente o participado como conferenciante.
               </p>
             </div>
             <ol className="institution-list">
@@ -256,7 +260,7 @@ export default function Home() {
               <span>Temas de Hoy</span>
               <span>Grupo Planeta</span>
             </div>
-            <a className="button-link" href="/biblioteca#libro">Descubrir el proyecto</a>
+            <Link className="button-link" href="/biblioteca">Explorar la biblioteca</Link>
           </Reveal>
         </div>
       </section>
@@ -294,11 +298,6 @@ export default function Home() {
               “Vestirse también es contar una historia, aunque no siempre sepamos
               todavía cómo leerla.”
             </blockquote>
-            <img
-              src="/images/media/carlos-tv.webp"
-              alt="Carlos Sánchez de Medina en un plató de televisión"
-              loading="lazy"
-            />
           </Reveal>
         </div>
       </section>
