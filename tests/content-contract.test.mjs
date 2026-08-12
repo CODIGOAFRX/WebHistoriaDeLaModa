@@ -153,7 +153,10 @@ test("exposes the verified 2026 conference and a real contact form", async () =>
 });
 
 test("keeps the archive focused on television and uses descriptive link titles", async () => {
-  const archive = await source("app/archivo/page.tsx");
+  const [archive, styles] = await Promise.all([
+    source("app/archivo/page.tsx"),
+    source("app/globals.css"),
+  ]);
   const featuredMedia = archive.match(/const featuredMedia = \[([\s\S]*?)\] as const;/)?.[1] ?? "";
   const fullArchive = archive.match(/const fullArchive = \[([\s\S]*?)\n\];/)?.[1] ?? "";
   const publications = fullArchive.match(/title: "Publicaciones",([\s\S]*?)title: "Entrevistas"/)?.[1] ?? "";
@@ -163,6 +166,11 @@ test("keeps the archive focused on television and uses descriptive link titles",
   assert.doesNotMatch(archive, /En los medios\.|const institutions|trajectory-section/i);
   assert.match(archive, /RTVE Play · La 2/);
   assert.match(archive, /Serie · 12 capítulos/);
+  assert.match(
+    styles,
+    /\.media-feature-card\s*\{[^}]*grid-column:\s*span 6;[^}]*min-height:\s*620px;/s,
+  );
+  assert.doesNotMatch(styles, /\.media-feature-card-[345][^{]*\{[^}]*grid-column:/s);
   const featuredOrder = [
     featuredMedia.indexOf("Geópolis: la geopolítica de la cosmética"),
     featuredMedia.indexOf("Canal Sur · La Memoria"),

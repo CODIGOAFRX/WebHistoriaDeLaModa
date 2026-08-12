@@ -833,6 +833,36 @@ test(
 );
 
 test(
+  "television cards form two perfectly aligned equal-size rows",
+  { skip: Boolean(process.env.QA_ROUTE) && process.env.QA_ROUTE !== "/archivo" },
+  async () => {
+    const viewport = viewports.find((candidate) => candidate.label === "desktop-wide");
+    const context = await createContext(viewport);
+    const page = await context.newPage();
+    try {
+      await page.goto(`${baseUrl}/archivo`, { waitUntil: "domcontentloaded" });
+      const cards = await page.locator(".media-feature-card").evaluateAll((elements) =>
+        elements.map((element) => {
+          const box = element.getBoundingClientRect();
+          return { left: box.left, top: box.top, width: box.width, height: box.height };
+        }),
+      );
+      assert.equal(cards.length, 4);
+      for (const card of cards.slice(1)) {
+        assert.ok(Math.abs(card.width - cards[0].width) <= 1, JSON.stringify(cards));
+        assert.ok(Math.abs(card.height - cards[0].height) <= 1, JSON.stringify(cards));
+      }
+      assert.ok(Math.abs(cards[0].left - cards[2].left) <= 1, JSON.stringify(cards));
+      assert.ok(Math.abs(cards[1].left - cards[3].left) <= 1, JSON.stringify(cards));
+      assert.ok(Math.abs(cards[0].top - cards[1].top) <= 1, JSON.stringify(cards));
+      assert.ok(Math.abs(cards[2].top - cards[3].top) <= 1, JSON.stringify(cards));
+    } finally {
+      await context.close();
+    }
+  },
+);
+
+test(
   "mobile navigation fills the viewport and its links never collide",
   { skip: Boolean(process.env.QA_ROUTE) },
   async () => {

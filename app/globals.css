@@ -1510,26 +1510,16 @@ main {
 .media-feature-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 1fr;
   gap: 24px;
 }
 
 .media-feature-card {
   position: relative;
-  min-height: 360px;
-  border: 1px solid var(--rule);
-  background: var(--paper-bright);
-}
-
-.media-feature-card-1,
-.media-feature-card-2 {
   grid-column: span 6;
   min-height: 620px;
-}
-
-.media-feature-card-3,
-.media-feature-card-4,
-.media-feature-card-5 {
-  grid-column: span 4;
+  border: 1px solid var(--rule);
+  background: var(--paper-bright);
 }
 
 .media-feature-card > a {
@@ -1579,12 +1569,6 @@ main {
   font-weight: 400;
   letter-spacing: -.04em;
   line-height: .95;
-}
-
-.media-feature-card-3 h3,
-.media-feature-card-4 h3,
-.media-feature-card-5 h3 {
-  font-size: clamp(32px, 3.4vw, 52px);
 }
 
 .media-feature-description {
@@ -3364,13 +3348,8 @@ main {
   }
 
   .media-feature-card {
-    min-height: 380px;
-    margin-bottom: 16px;
-  }
-
-  .media-feature-card-1,
-  .media-feature-card-2 {
     min-height: 500px;
+    margin-bottom: 16px;
   }
 
   .timeline-entry {
