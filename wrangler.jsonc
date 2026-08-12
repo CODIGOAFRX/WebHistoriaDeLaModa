@@ -18,7 +18,7 @@
     {
       "binding": "DB",
       "database_name": "historia-de-la-moda-production",
-      "database_id": "00000000-0000-4000-8000-000000000000",
+      "database_id": "ac2299cd-85ad-4fdf-a45d-2371a9bf6558",
       "migrations_dir": "drizzle"
     }
   ],
