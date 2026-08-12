@@ -10,6 +10,15 @@ const decoder = new TextDecoder();
 
 export type AdminEnvironment = Record<string, string | undefined>;
 
+export type AdminAuthOptions = {
+  allowInsecureDefaults?: boolean;
+};
+
+export type AdminCredentials = {
+  username: string;
+  password: string;
+};
+
 export type AdminSession = {
   username: string;
   issuedAt: number;
@@ -26,19 +35,67 @@ type SessionPayload = {
 
 export function getAdminCredentials(
   environment: AdminEnvironment = process.env,
-): { username: string; password: string } {
+  options: AdminAuthOptions = {},
+): AdminCredentials | null {
+  const username = nonEmpty(environment.ADMIN_USERNAME);
+  const password = nonEmpty(environment.ADMIN_PASSWORD);
+
+  if (username && password) {
+    return { username, password };
+  }
+  if (!options.allowInsecureDefaults) return null;
+
   return {
-    username: nonEmpty(environment.ADMIN_USERNAME) ?? DEFAULT_ADMIN_USERNAME,
-    password: nonEmpty(environment.ADMIN_PASSWORD) ?? DEFAULT_ADMIN_PASSWORD,
+    username: username ?? DEFAULT_ADMIN_USERNAME,
+    password: password ?? DEFAULT_ADMIN_PASSWORD,
   };
+}
+
+export function isAdminConfigurationReady(
+  environment: AdminEnvironment = process.env,
+  options: AdminAuthOptions = {},
+): boolean {
+  if (!getAdminCredentials(environment, options)) return false;
+  return (
+    options.allowInsecureDefaults === true ||
+    nonEmpty(environment.ADMIN_SESSION_SECRET) !== null
+  );
+}
+
+export function isLocalAdminHost(host: string | null | undefined): boolean {
+  const normalized = host?.trim().toLowerCase();
+  if (!normalized) return false;
+  if (normalized === "::1") return true;
+
+  try {
+    const url = new URL(`http://${normalized}`);
+    if (
+      url.username ||
+      url.password ||
+      url.pathname !== "/" ||
+      url.search ||
+      url.hash
+    ) {
+      return false;
+    }
+    return (
+      url.hostname === "localhost" ||
+      url.hostname === "127.0.0.1" ||
+      url.hostname === "[::1]"
+    );
+  } catch {
+    return false;
+  }
 }
 
 export async function verifyAdminCredentials(
   username: string,
   password: string,
   environment: AdminEnvironment = process.env,
+  options: AdminAuthOptions = {},
 ): Promise<boolean> {
-  const expected = getAdminCredentials(environment);
+  const expected = getAdminCredentials(environment, options);
+  if (!expected) return false;
   const [usernameMatches, passwordMatches] = await Promise.all([
     secureTextEqual(username, expected.username),
     secureTextEqual(password, expected.password),
@@ -51,6 +108,7 @@ export async function createAdminSession(
   username: string,
   environment: AdminEnvironment = process.env,
   nowMilliseconds = Date.now(),
+  options: AdminAuthOptions = {},
 ): Promise<string> {
   const now = Math.floor(nowMilliseconds / 1000);
   const nonce = new Uint8Array(16);
@@ -63,7 +121,10 @@ export async function createAdminSession(
     n: toBase64Url(nonce),
   };
   const encodedPayload = toBase64Url(encoder.encode(JSON.stringify(payload)));
-  const signature = await sign(encodedPayload, environment);
+  const signature = await sign(encodedPayload, environment, options);
+  if (!signature) {
+    throw new Error("La autenticación administrativa no está configurada.");
+  }
 
   return `${encodedPayload}.${toBase64Url(signature)}`;
 }
@@ -72,6 +133,7 @@ export async function verifyAdminSession(
   token: string | null | undefined,
   environment: AdminEnvironment = process.env,
   nowMilliseconds = Date.now(),
+  options: AdminAuthOptions = {},
 ): Promise<AdminSession | null> {
   if (!token) return null;
 
@@ -85,7 +147,11 @@ export async function verifyAdminSession(
     return null;
   }
 
-  const expectedSignature = await sign(parts[0], environment);
+  const expectedCredentials = getAdminCredentials(environment, options);
+  if (!expectedCredentials) return null;
+
+  const expectedSignature = await sign(parts[0], environment, options);
+  if (!expectedSignature) return null;
   if (!secureBytesEqual(receivedSignature, expectedSignature)) return null;
 
   let payload: SessionPayload;
@@ -96,10 +162,9 @@ export async function verifyAdminSession(
   }
 
   const now = Math.floor(nowMilliseconds / 1000);
-  const expectedUsername = getAdminCredentials(environment).username;
   const usernameMatches =
     typeof payload.u === "string" &&
-    (await secureTextEqual(payload.u, expectedUsername));
+    (await secureTextEqual(payload.u, expectedCredentials.username));
   const validTimes =
     Number.isInteger(payload.iat) &&
     Number.isInteger(payload.exp) &&
@@ -128,9 +193,10 @@ export async function getAdminSessionFromCookieHeader(
   cookieHeader: string | null | undefined,
   environment: AdminEnvironment = process.env,
   nowMilliseconds = Date.now(),
+  options: AdminAuthOptions = {},
 ): Promise<AdminSession | null> {
   const token = getCookieValue(cookieHeader, ADMIN_COOKIE_NAME);
-  return verifyAdminSession(token, environment, nowMilliseconds);
+  return verifyAdminSession(token, environment, nowMilliseconds, options);
 }
 
 export function createAdminSessionCookie(token: string, secure: boolean): string {
@@ -191,8 +257,10 @@ export function getCookieValue(
 async function sign(
   encodedPayload: string,
   environment: AdminEnvironment,
-): Promise<Uint8Array> {
-  const key = await sessionKey(environment);
+  options: AdminAuthOptions,
+): Promise<Uint8Array | null> {
+  const key = await sessionKey(environment, options);
+  if (!key) return null;
   const signature = await crypto.subtle.sign(
     "HMAC",
     key,
@@ -201,9 +269,15 @@ async function sign(
   return new Uint8Array(signature);
 }
 
-async function sessionKey(environment: AdminEnvironment): Promise<CryptoKey> {
+async function sessionKey(
+  environment: AdminEnvironment,
+  options: AdminAuthOptions,
+): Promise<CryptoKey | null> {
   const explicitSecret = nonEmpty(environment.ADMIN_SESSION_SECRET);
-  const credentials = getAdminCredentials(environment);
+  const credentials = getAdminCredentials(environment, options);
+  if (!credentials || (!explicitSecret && !options.allowInsecureDefaults)) {
+    return null;
+  }
   const source =
     explicitSecret ??
     `${SESSION_DERIVATION_CONTEXT}\u0000${credentials.username}\u0000${credentials.password}`;

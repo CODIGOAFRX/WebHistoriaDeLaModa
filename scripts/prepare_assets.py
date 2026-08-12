@@ -1,9 +1,31 @@
+import argparse
 from pathlib import Path
 from PIL import Image, ImageOps
 
 
-SOURCE = Path(r"C:\Users\USUARIO\Desktop\CODE\historia de la moda web\Web Historia de la moda")
-DESTINATION = Path(__file__).resolve().parents[1] / "public" / "images"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Optimiza los materiales visuales de la web.")
+    parser.add_argument(
+        "--source",
+        type=Path,
+        default=PROJECT_ROOT / "Web Historia de la moda",
+        help="Carpeta de materiales originales (por defecto, junto al proyecto).",
+    )
+    parser.add_argument(
+        "--destination",
+        type=Path,
+        default=PROJECT_ROOT / "public" / "images",
+        help="Carpeta de salida de recursos web.",
+    )
+    return parser.parse_args()
+
+
+OPTIONS = arguments()
+SOURCE = OPTIONS.source.resolve()
+DESTINATION = OPTIONS.destination.resolve()
 
 
 def save_raster(source: Path, destination: Path, size: tuple[int, int], *, crop: bool = True) -> None:

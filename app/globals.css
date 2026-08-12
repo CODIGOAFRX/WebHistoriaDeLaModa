@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/cormorant-garamond-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/cormorant-garamond-latin-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/manrope-latin.woff2") format("woff2");
+}
+
 :root {
   --ink: #171513;
   --ink-soft: #4f4a46;

@@ -22,6 +22,23 @@ npm test
 npm run lint
 ```
 
+## Publicación en Cloudflare
+
+El proyecto se publica como Cloudflare Worker con D1. La configuración está en
+`wrangler.jsonc` y la guía completa para crear la base, cargar secretos, asociar
+`historiadelamoda.net` y conectar GitHub está en
+[`docs/DESPLIEGUE_CLOUDFLARE.md`](docs/DESPLIEGUE_CLOUDFLARE.md).
+
+Antes de publicar, ejecuta:
+
+```bash
+npm run check:cloudflare
+```
+
+La comprobación se detiene deliberadamente mientras `wrangler.jsonc` conserve
+el UUID D1 de ceros. Para revisar solo el build antes de crear la base remota,
+usa `npm run check:cloudflare:artifact`.
+
 ## Contenido y administración
 
 - La web pública vive en `app/`.

@@ -1,11 +1,25 @@
+import argparse
 from pathlib import Path
+
 from PIL import Image, ImageOps
 
 
-source = Path(
-    r"C:\Users\USUARIO\.codex\generated_images\019ff1e7-99b5-77e1-b466-b303544d1122\exec-8ab68c13-5ae9-42e9-bc16-dc2203b0faa0.png"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+parser = argparse.ArgumentParser(description="Prepara la imagen social de 1200 × 630 px.")
+parser.add_argument("source", type=Path, help="Imagen de origen.")
+parser.add_argument(
+    "--destination",
+    type=Path,
+    default=PROJECT_ROOT / "public" / "og.png",
+    help="PNG de salida (por defecto public/og.png).",
 )
-destination = Path(__file__).resolve().parents[1] / "public" / "og.png"
+options = parser.parse_args()
+
+source = options.source.resolve()
+destination = options.destination.resolve()
+destination.parent.mkdir(parents=True, exist_ok=True)
 
 with Image.open(source) as image:
     image = ImageOps.exif_transpose(image).convert("RGB")

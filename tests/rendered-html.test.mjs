@@ -59,7 +59,11 @@ test("server-renders the finished Historia de la Moda homepage", async () => {
     /Historia[\s\S]*Podcasts[\s\S]*Conferencias[\s\S]*Aula[\s\S]*Archivo[\s\S]*Biblioteca[\s\S]*Contacto/i,
   );
   assert.doesNotMatch(navigation, /Instagram/i);
-  assert.match(html, /http:\/\/localhost\/og\.png/);
+  assert.match(html, /https:\/\/historiadelamoda\.net\/og\.png/);
+  assert.doesNotMatch(
+    html,
+    /(?:file:\/\/|https?:\/\/(?:localhost|127\.0\.0\.1)|(?:^|[\s"'(=])[A-Za-z]:[\\/])/i,
+  );
   assert.doesNotMatch(html, /class="book-section"|book-title-lines|book-publisher/i);
   assert.doesNotMatch(
     html,
@@ -82,6 +86,61 @@ test("renders all primary public routes", async () => {
     const response = await render(pathname);
     assert.equal(response.status, 200, pathname);
     assert.match(await response.text(), heading, pathname);
+  }
+});
+
+test("publishes exactly one canonical production URL per public route", async () => {
+  const routes = [
+    "/",
+    "/podcasts",
+    "/conferencias",
+    "/biblioteca",
+    "/escuela",
+    "/archivo",
+    "/contacto",
+  ];
+
+  for (const pathname of routes) {
+    const response = await render(pathname);
+    assert.equal(response.status, 200, pathname);
+    const html = await response.text();
+    const canonicalTags = [
+      ...html.matchAll(/<link\b(?=[^>]*\brel="canonical")[^>]*>/gi),
+    ];
+    assert.equal(canonicalTags.length, 1, `${pathname}: canonical único`);
+    const href = canonicalTags[0][0].match(/\bhref="([^"]+)"/i)?.[1];
+    const expected =
+      pathname === "/"
+        ? "https://historiadelamoda.net"
+        : `https://historiadelamoda.net${pathname}`;
+    assert.equal(href, expected, pathname);
+  }
+
+  const queryResponse = await render("/podcasts?utm_source=qa");
+  const queryHtml = await queryResponse.text();
+  const queryCanonical = queryHtml.match(
+    /<link\b(?=[^>]*\brel="canonical")[^>]*\bhref="([^"]+)"[^>]*>/i,
+  )?.[1];
+  assert.equal(queryCanonical, "https://historiadelamoda.net/podcasts");
+});
+
+test("publishes production robots and sitemap without local URLs", async () => {
+  for (const pathname of ["/robots.txt", "/sitemap.xml"]) {
+    const response = await render(pathname, {
+      headers: {
+        host: "historiadelamoda.net",
+        "x-forwarded-host": "historiadelamoda.net",
+        "x-forwarded-proto": "https",
+      },
+    });
+    assert.equal(response.status, 200, pathname);
+    const body = await response.text();
+    assert.match(body, /https:\/\/historiadelamoda\.net/i, pathname);
+    assert.doesNotMatch(
+      body,
+      /(?:file:\/\/|https?:\/\/(?:localhost|127\.0\.0\.1)|(?:^|[\s"'(=])[A-Za-z]:[\\/])/i,
+      pathname,
+    );
   }
 });
 

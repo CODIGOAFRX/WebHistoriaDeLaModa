@@ -1,6 +1,8 @@
 import {
   createAdminSession,
   createAdminSessionCookie,
+  isAdminConfigurationReady,
+  isLocalAdminHost,
   isSameOriginRequest,
   isSecureRequest,
   verifyAdminCredentials,
@@ -37,8 +39,7 @@ async function adminLoginRateLimiter(): Promise<AdminLoginRateLimiter | undefine
 }
 
 function isLocalRequest(request: Request): boolean {
-  const hostname = new URL(request.url).hostname;
-  return hostname === "localhost" || hostname === "127.0.0.1";
+  return isLocalAdminHost(new URL(request.url).host);
 }
 
 function localLoginLimit(key: string, now = Date.now()): { success: boolean } {
@@ -62,10 +63,21 @@ export async function POST(request: Request) {
   const wantsJson = request.headers
     .get("content-type")
     ?.toLowerCase()
-    .includes("application/json");
+    .includes("application/json") ?? false;
   const credentials = await readCredentials(request, wantsJson);
   if (!credentials) {
     return loginFailure(request, wantsJson, 400, "Faltan las credenciales.");
+  }
+
+  const authOptions = { allowInsecureDefaults: isLocalRequest(request) };
+  if (!isAdminConfigurationReady(process.env, authOptions)) {
+    return loginServiceFailure(
+      request,
+      wantsJson,
+      503,
+      "unavailable",
+      "El acceso no está disponible temporalmente.",
+    );
   }
 
   const limiter = await adminLoginRateLimiter();
@@ -111,6 +123,8 @@ export async function POST(request: Request) {
   const valid = await verifyAdminCredentials(
     credentials.username,
     credentials.password,
+    process.env,
+    authOptions,
   );
   if (!valid) {
     return loginFailure(
@@ -121,7 +135,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const token = await createAdminSession(credentials.username);
+  const token = await createAdminSession(
+    credentials.username,
+    process.env,
+    Date.now(),
+    authOptions,
+  );
   const cookie = createAdminSessionCookie(token, isSecureRequest(request));
   const headers = new Headers({
     "Cache-Control": "no-store",

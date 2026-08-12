@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getAdminSessionFromCookieHeader } from "../auth";
+import {
+  getAdminSessionFromCookieHeader,
+  isLocalAdminHost,
+} from "../auth";
 import styles from "../admin.module.css";
 
 export const metadata: Metadata = {
@@ -20,6 +23,9 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
   const requestHeaders = await headers();
   const existingSession = await getAdminSessionFromCookieHeader(
     requestHeaders.get("cookie"),
+    process.env,
+    undefined,
+    { allowInsecureDefaults: isLocalAdminHost(requestHeaders.get("host")) },
   );
   if (existingSession) redirect("/admin");
 

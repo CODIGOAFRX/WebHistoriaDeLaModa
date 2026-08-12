@@ -124,13 +124,13 @@ test("keeps unpublished editorial projects out of the public site and seed data"
 });
 
 test("exposes the verified 2026 conference and a real contact form", async () => {
-  const [conferences, contactPage, contactForm, contactRoute, rateLimit, viteConfig] = await Promise.all([
+  const [conferences, contactPage, contactForm, contactRoute, rateLimit, wranglerConfig] = await Promise.all([
     source("app/conferencias/page.tsx"),
     source("app/contacto/page.tsx"),
     source("app/contacto/ContactForm.tsx"),
     source("app/api/contacto/route.ts"),
     source("app/api/contacto/rate-limit.ts"),
-    source("vite.config.ts"),
+    source("wrangler.jsonc"),
   ]);
 
   assert.match(conferences, /wUzjeWzRTWQ/);
@@ -143,7 +143,7 @@ test("exposes the verified 2026 conference and a real contact form", async () =>
   assert.match(contactRoute, /api\.resend\.com\/emails/);
   assert.match(contactRoute, /getContactRateLimiter/);
   assert.match(rateLimit, /CONTACT_RATE_LIMITER/);
-  assert.match(viteConfig, /CONTACT_RATE_LIMITER/);
+  assert.match(wranglerConfig, /CONTACT_RATE_LIMITER/);
   assert.match(contactRoute, /readBodyWithinLimit/);
   assert.match(contactForm, /submissionId/);
   assert.match(contactRoute, /Idempotency-Key.*contact-/s);

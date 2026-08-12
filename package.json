@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "vinext dev",
-    "build": "vinext build",
+    "build": "vinext build && node scripts/sanitize-cloudflare-build.mjs",
     "start": "vinext start",
     "test": "npm run build && npm run test:unit && node --test tests/browser-responsive.test.mjs && npm run test:admin-ui",
     "test:unit": "npm run test:auth && npm run test:contact && node --test tests/rendered-html.test.mjs tests/content-contract.test.mjs",
@@ -16,7 +16,14 @@
     "test:contact": "node --experimental-strip-types --test tests/contact-form.test.mjs",
     "test:admin-ui": "node --test tests/admin-crud-browser.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "check:cloudflare": "npm run check:cloudflare:config && npm run check:cloudflare:artifact",
+    "check:cloudflare:artifact": "npm run build && node scripts/check-cloudflare-readiness.mjs",
+    "check:cloudflare:config": "node scripts/validate-cloudflare-config.mjs",
+    "check:cloudflare:secrets": "node scripts/validate-cloudflare-secrets.mjs",
+    "preview:cloudflare": "npm run check:cloudflare:artifact && vite preview --host 127.0.0.1 --port 30000",
+    "deploy:cloudflare:first": "npm run check:cloudflare:secrets && npm run check:cloudflare && wrangler deploy --config dist/server/wrangler.json --secrets-file .env.production",
+    "deploy:cloudflare": "npm run check:cloudflare && vinext-cloudflare deploy --skip-build --config dist/server/wrangler.json"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
@@ -32,6 +39,7 @@
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "@vinext/cloudflare": "1.0.0-beta.2",
     "@vitejs/plugin-react": "6.0.2",
     "@vitejs/plugin-rsc": "0.5.26",
     "axe-core": "^4.13.0",

@@ -1,4 +1,7 @@
-import { getAdminSessionFromCookieHeader } from "@/app/admin/auth";
+import {
+  getAdminSessionFromCookieHeader,
+  isLocalAdminHost,
+} from "@/app/admin/auth";
 import {
   ContentStorageUnavailableError,
   createContent,
@@ -121,6 +124,9 @@ export async function DELETE(request: Request) {
 async function authorizeAdmin(request: Request): Promise<AuthorizationResult> {
   const session = await getAdminSessionFromCookieHeader(
     request.headers.get("cookie"),
+    process.env,
+    undefined,
+    { allowInsecureDefaults: isLocalAdminHost(new URL(request.url).host) },
   );
   if (!session) {
     return {

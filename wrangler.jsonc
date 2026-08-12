@@ -1,0 +1,52 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "historia-de-la-moda",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-05-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "historiadelamoda.net",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "historia-de-la-moda-production",
+      "database_id": "00000000-0000-4000-8000-000000000000",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "CONTACT_RATE_LIMITER",
+      "namespace_id": "8112026",
+      "simple": { "limit": 3, "period": 60 }
+    },
+    {
+      "name": "ADMIN_LOGIN_RATE_LIMITER",
+      "namespace_id": "12082026",
+      "simple": { "limit": 8, "period": 60 }
+    }
+  ],
+  "vars": {
+    "CONTACT_FROM_EMAIL": "Historia de la Moda <contacto@historiadelamoda.net>",
+    "CONTACT_TO_EMAIL": "demedinamoda@gmail.com"
+  },
+  "secrets": {
+    "required": [
+      "ADMIN_USERNAME",
+      "ADMIN_PASSWORD",
+      "ADMIN_SESSION_SECRET",
+      "RESEND_API_KEY"
+    ]
+  },
+  "observability": {
+    "enabled": true
+  }
+}

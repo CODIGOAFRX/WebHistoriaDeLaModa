@@ -7,7 +7,10 @@ import {
   getAdminContent,
 } from "@/db/content";
 import { AdminStudio } from "./AdminStudio";
-import { getAdminSessionFromCookieHeader } from "./auth";
+import {
+  getAdminSessionFromCookieHeader,
+  isLocalAdminHost,
+} from "./auth";
 
 export const metadata: Metadata = {
   title: "Administración",
@@ -21,6 +24,9 @@ export default async function AdminPage() {
   const requestHeaders = await headers();
   const session = await getAdminSessionFromCookieHeader(
     requestHeaders.get("cookie"),
+    process.env,
+    undefined,
+    { allowInsecureDefaults: isLocalAdminHost(requestHeaders.get("host")) },
   );
 
   if (!session) redirect("/admin/login");
