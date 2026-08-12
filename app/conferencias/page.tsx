@@ -163,7 +163,7 @@ export default function ConferencesPage() {
           </p>
           <a
             className="button-link is-light"
-            href="mailto:demedinamoda@gmail.com?subject=Propuesta%20de%20conferencia"
+            href="mailto:contacto@historiadelamoda.net?subject=Propuesta%20de%20conferencia"
           >
             Proponer una conferencia
           </a>

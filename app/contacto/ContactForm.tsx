@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useRef, useState } from "react";
+import { PUBLIC_CONTACT_EMAIL } from "./contact";
 
 type FormStatus =
   | { state: "idle" }
@@ -47,13 +48,12 @@ export function ContactForm() {
       submissionId.current = null;
       setStatus({
         state: "success",
-        message: "Mensaje enviado. Gracias; te responderemos por correo.",
+        message: "Mensaje enviado. Te hemos mandado una confirmación por correo.",
       });
     } catch {
       setStatus({
         state: "error",
-        message:
-          "No se ha podido conectar. Puedes escribir a demedinamoda@gmail.com.",
+        message: `No se ha podido conectar. Puedes escribir a ${PUBLIC_CONTACT_EMAIL}.`,
       });
     }
   }
@@ -139,8 +139,8 @@ export function ContactForm() {
         <button className="button-link" type="submit">
           {status.state === "sending" ? "Enviando…" : "Enviar mensaje"}
         </button>
-        <a className="text-link" href="mailto:demedinamoda@gmail.com">
-          demedinamoda@gmail.com
+        <a className="text-link" href={`mailto:${PUBLIC_CONTACT_EMAIL}`}>
+          {PUBLIC_CONTACT_EMAIL}
         </a>
       </div>
       </fieldset>

@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  buildContactConfirmationEmail,
   buildContactEmail,
+  buildContactEmailBatch,
+  PUBLIC_CONTACT_EMAIL,
   readBodyWithinLimit,
   validateContactPayload,
 } from "../app/contacto/contact.ts";
@@ -53,6 +56,30 @@ test("builds a plain-text email and removes header newlines", () => {
   assert.doesNotMatch(email.subject, /[\r\n]/);
   assert.match(email.text, /Correo: ana@example\.com/);
   assert.match(email.text, /Entidad: Museo/);
+});
+
+test("builds the internal message and the automatic confirmation as one batch", () => {
+  const confirmation = buildContactConfirmationEmail();
+  assert.match(confirmation.subject, /Hemos recibido tu mensaje/);
+  assert.match(confirmation.text, /equipo de Historia de la Moda/i);
+  assert.match(confirmation.text, /responderemos lo antes posible/i);
+
+  const batch = buildContactEmailBatch(
+    {
+      name: "Ana Pérez",
+      email: "ana@example.com",
+      organization: "Museo",
+      topic: "Otro",
+      message: "Un mensaje de prueba suficientemente largo.",
+    },
+    `Historia de la Moda <${PUBLIC_CONTACT_EMAIL}>`,
+  );
+
+  assert.equal(batch.length, 2);
+  assert.deepEqual(batch[0].to, [PUBLIC_CONTACT_EMAIL]);
+  assert.equal(batch[0].reply_to, "ana@example.com");
+  assert.deepEqual(batch[1].to, ["ana@example.com"]);
+  assert.equal(batch[1].reply_to, PUBLIC_CONTACT_EMAIL);
 });
 
 test("stops reading request bodies as soon as the byte limit is exceeded", async () => {

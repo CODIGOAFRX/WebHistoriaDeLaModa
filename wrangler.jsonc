@@ -36,7 +36,7 @@
   ],
   "vars": {
     "CONTACT_FROM_EMAIL": "Historia de la Moda <contacto@historiadelamoda.net>",
-    "CONTACT_TO_EMAIL": "demedinamoda@gmail.com"
+    "CONTACT_TO_EMAIL": "contacto@historiadelamoda.net"
   },
   "secrets": {
     "required": [

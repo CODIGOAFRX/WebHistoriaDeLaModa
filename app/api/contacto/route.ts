@@ -1,5 +1,6 @@
 import {
-  buildContactEmail,
+  buildContactEmailBatch,
+  PUBLIC_CONTACT_EMAIL,
   readBodyWithinLimit,
   validateContactPayload,
 } from "@/app/contacto/contact";
@@ -101,12 +102,12 @@ export async function POST(request: Request) {
 
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.CONTACT_FROM_EMAIL?.trim();
-  const to = process.env.CONTACT_TO_EMAIL?.trim() || "demedinamoda@gmail.com";
+  const to = process.env.CONTACT_TO_EMAIL?.trim() || PUBLIC_CONTACT_EMAIL;
   if (!apiKey || !from) {
     return Response.json(
       {
         error:
-          "El envío automático todavía no está configurado. Puedes escribir a demedinamoda@gmail.com.",
+          `El envío automático todavía no está configurado. Puedes escribir a ${PUBLIC_CONTACT_EMAIL}.`,
       },
       { status: 503, headers: { "Cache-Control": "no-store" } },
     );
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
     return Response.json(
       {
         error:
-          "La protección antispam no está disponible. Puedes escribir a demedinamoda@gmail.com.",
+          `La protección antispam no está disponible. Puedes escribir a ${PUBLIC_CONTACT_EMAIL}.`,
       },
       { status: 503, headers: { "Cache-Control": "no-store" } },
     );
@@ -130,7 +131,7 @@ export async function POST(request: Request) {
     return Response.json(
       {
         error:
-          "La protección antispam no está disponible. Puedes escribir a demedinamoda@gmail.com.",
+          `La protección antispam no está disponible. Puedes escribir a ${PUBLIC_CONTACT_EMAIL}.`,
       },
       { status: 503, headers: { "Cache-Control": "no-store" } },
     );
@@ -143,30 +144,24 @@ export async function POST(request: Request) {
     );
   }
 
-  const email = buildContactEmail(validation.data);
+  const emails = buildContactEmailBatch(validation.data, from, to);
   let response: Response;
   try {
-    response = await fetch("https://api.resend.com/emails", {
+    response = await fetch("https://api.resend.com/emails/batch", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "Idempotency-Key": `contact-${submissionId}`,
+        "Idempotency-Key": `contact-batch-${submissionId}`,
       },
-      body: JSON.stringify({
-        from,
-        to: [to],
-        reply_to: validation.data.email,
-        subject: email.subject,
-        text: email.text,
-      }),
+      body: JSON.stringify(emails),
       signal: AbortSignal.timeout(10_000),
     });
   } catch {
     return Response.json(
       {
         error:
-          "No se ha podido conectar con el servicio de correo. Puedes escribir a demedinamoda@gmail.com.",
+          `No se ha podido conectar con el servicio de correo. Puedes escribir a ${PUBLIC_CONTACT_EMAIL}.`,
       },
       { status: 502, headers: { "Cache-Control": "no-store" } },
     );
@@ -176,7 +171,7 @@ export async function POST(request: Request) {
     return Response.json(
       {
         error:
-          "No se ha podido enviar el mensaje ahora mismo. Puedes escribir a demedinamoda@gmail.com.",
+          `No se ha podido enviar el mensaje ahora mismo. Puedes escribir a ${PUBLIC_CONTACT_EMAIL}.`,
       },
       { status: 502, headers: { "Cache-Control": "no-store" } },
     );

@@ -132,7 +132,7 @@ export default async function SchoolPage() {
                   ) : (
                     <a
                       className="text-link"
-                      href={`mailto:demedinamoda@gmail.com?subject=${encodeURIComponent(`Lista de espera: ${course.title}`)}`}
+                      href={`mailto:contacto@historiadelamoda.net?subject=${encodeURIComponent(`Lista de espera: ${course.title}`)}`}
                       aria-label={`Apuntarme a la lista: ${course.title}`}
                     >
                       Apuntarme a la lista

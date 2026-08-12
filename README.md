@@ -52,7 +52,9 @@ usa `npm run check:cloudflare:artifact`.
 - Los cursos admiten una URL de lanzamiento SCORM, que se abre dentro del aula.
 - `/contacto` ofrece un formulario con validación y entrega mediante la API de
   Resend. Configura `RESEND_API_KEY`, `CONTACT_FROM_EMAIL` y, si se desea,
-  `CONTACT_TO_EMAIL`; el remitente debe pertenecer a un dominio verificado.
+  `CONTACT_TO_EMAIL`; el remitente debe pertenecer a un dominio verificado. El
+  formulario entrega la consulta al correo del dominio y envía al usuario una
+  confirmación automática en la misma operación transaccional.
 
 Para una instalación local, copia `.env.example` como `.env.local` y ajusta las
 credenciales. El acceso `admin` / `admin` es deliberadamente provisional e

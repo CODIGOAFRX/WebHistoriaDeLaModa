@@ -149,9 +149,10 @@ el formulario responde de forma controlada indicando que el envío automático
 no está configurado; el resto de la web continúa funcionando normalmente.
 
 El remitente ya está configurado como
-`Historia de la Moda <contacto@historiadelamoda.net>` y los mensajes llegan a
-`demedinamoda@gmail.com`. La verificación de Resend autoriza el envío; no crea
-por sí sola un buzón para `contacto@historiadelamoda.net`.
+`Historia de la Moda <contacto@historiadelamoda.net>` y los mensajes se envían
+a `contacto@historiadelamoda.net`, cuya regla de correo los reenvía a
+`demedinamoda@gmail.com`. El formulario también manda una confirmación
+automática a la persona que contacta.
 
 Cloudflare cifra estos valores como secretos. Referencia:
 [Workers Secrets](https://developers.cloudflare.com/workers/configuration/secrets/).
@@ -290,8 +291,10 @@ Comprueba en una ventana privada:
 4. `/robots.txt` y `/sitemap.xml` responden y solo usan el dominio real.
 5. `/admin` no acepta `admin/admin`.
 6. Crear, publicar y eliminar una ficha de prueba confirma D1.
-7. El formulario envía un correo real a `demedinamoda@gmail.com`; al pulsar
-   **Responder**, el destinatario es el correo introducido en el formulario.
+7. El formulario envía la consulta a `contacto@historiadelamoda.net`, que la
+   reenvía a `demedinamoda@gmail.com`; al pulsar **Responder**, el destinatario
+   es el correo introducido en el formulario. Esa persona recibe además un
+   acuse automático desde el correo del dominio.
 8. En DevTools → Network no aparece ninguna petición a `localhost`,
    `127.0.0.1`, `file://`, puertos 3000/30000 ni rutas `C:\...`.
 9. Los recursos `/fonts/*`, `/images/*` y `/_next/static/*` responden 200.

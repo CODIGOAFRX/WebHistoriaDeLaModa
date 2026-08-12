@@ -6,6 +6,16 @@ export type ContactMessage = {
   message: string;
 };
 
+export const PUBLIC_CONTACT_EMAIL = "contacto@historiadelamoda.net";
+
+type ResendEmail = {
+  from: string;
+  to: string[];
+  reply_to: string;
+  subject: string;
+  text: string;
+};
+
 export type ContactValidation =
   | { ok: true; data: ContactMessage; isBot: boolean }
   | { ok: false; error: string };
@@ -123,7 +133,7 @@ export function buildContactEmail(data: ContactMessage) {
   return {
     subject: `Contacto web · ${safeTopic} · ${safeName}`.slice(0, 180),
     text: [
-      "Nuevo mensaje desde historiadelamoda.es",
+      "Nuevo mensaje desde historiadelamoda.net",
       "",
       `Nombre: ${data.name}`,
       `Correo: ${data.email}`,
@@ -134,4 +144,48 @@ export function buildContactEmail(data: ContactMessage) {
       data.message,
     ].join("\n"),
   };
+}
+
+export function buildContactConfirmationEmail() {
+  return {
+    subject: "Hemos recibido tu mensaje · Historia de la Moda",
+    text: [
+      "Gracias por ponerte en contacto con el equipo de Historia de la Moda.",
+      "",
+      "Tu mensaje se ha recibido correctamente. Te responderemos lo antes posible.",
+      "",
+      "Un saludo,",
+      "Equipo de Historia de la Moda",
+      "https://historiadelamoda.net",
+      PUBLIC_CONTACT_EMAIL,
+      "",
+      "Este es un mensaje automático de confirmación.",
+    ].join("\n"),
+  };
+}
+
+export function buildContactEmailBatch(
+  data: ContactMessage,
+  from: string,
+  inbox = PUBLIC_CONTACT_EMAIL,
+): ResendEmail[] {
+  const notification = buildContactEmail(data);
+  const confirmation = buildContactConfirmationEmail();
+
+  return [
+    {
+      from,
+      to: [inbox],
+      reply_to: data.email,
+      subject: notification.subject,
+      text: notification.text,
+    },
+    {
+      from,
+      to: [data.email],
+      reply_to: inbox,
+      subject: confirmation.subject,
+      text: confirmation.text,
+    },
+  ];
 }

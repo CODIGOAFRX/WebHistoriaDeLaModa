@@ -140,13 +140,15 @@ test("exposes the verified 2026 conference and a real contact form", async () =>
   assert.match(contactPage, /title="Hablemos\."/);
   assert.match(contactForm, /name="message"/);
   assert.match(contactForm, /name="consent"/);
-  assert.match(contactRoute, /api\.resend\.com\/emails/);
+  assert.doesNotMatch(contactForm, /demedinamoda@gmail\.com/i);
+  assert.match(contactForm, /PUBLIC_CONTACT_EMAIL/);
+  assert.match(contactRoute, /api\.resend\.com\/emails\/batch/);
   assert.match(contactRoute, /getContactRateLimiter/);
   assert.match(rateLimit, /CONTACT_RATE_LIMITER/);
   assert.match(wranglerConfig, /CONTACT_RATE_LIMITER/);
   assert.match(contactRoute, /readBodyWithinLimit/);
   assert.match(contactForm, /submissionId/);
-  assert.match(contactRoute, /Idempotency-Key.*contact-/s);
+  assert.match(contactRoute, /Idempotency-Key.*contact-batch-/s);
   const adminContentRoute = await source("app/api/admin/content/route.ts");
   assert.match(adminContentRoute, /requireSecure/);
   assert.match(adminContentRoute, /debe usar HTTPS o comenzar por/);
