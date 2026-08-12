@@ -79,7 +79,13 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
     [vinextCli, "dev", "--hostname", "127.0.0.1", "--port", String(port)],
     {
       cwd: projectRoot,
-      env: { ...process.env, NODE_ENV: "development" },
+      env: {
+        ...process.env,
+        NODE_ENV: "development",
+        ADMIN_USERNAME: "admin",
+        ADMIN_PASSWORD: "admin",
+        ADMIN_SESSION_SECRET: "admin-crud-qa-session-secret-that-never-reaches-production",
+      },
       stdio: ["ignore", "pipe", "pipe"],
       windowsHide: true,
     },

@@ -6,7 +6,6 @@ const expectedSecrets = [
   "ADMIN_USERNAME",
   "ADMIN_PASSWORD",
   "ADMIN_SESSION_SECRET",
-  "RESEND_API_KEY",
 ];
 
 const config = JSON.parse(await readFile(configUrl, "utf8"));

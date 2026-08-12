@@ -185,6 +185,30 @@ test("contact endpoint validates requests and silently discards the honeypot", a
   assert.equal(honeypot.status, 202);
 });
 
+test("contact endpoint fails safely while Resend is not configured", async () => {
+  const response = await render("/api/contacto", {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      origin: "http://localhost",
+    },
+    body: JSON.stringify({
+      name: "Ana Pérez",
+      email: "ana@example.com",
+      organization: "Museo",
+      topic: "Otro",
+      message: "Este mensaje tiene la longitud mínima solicitada.",
+      website: "",
+      consent: true,
+      submissionId: "123e4567-e89b-42d3-a456-426614174000",
+    }),
+  });
+
+  assert.equal(response.status, 503);
+  assert.match(await response.text(), /envío automático todavía no está configurado/i);
+});
+
 test("logout only expires the admin session through a same-origin POST", async () => {
   const readOnly = await render("/admin/logout");
   assert.equal(readOnly.status, 303);

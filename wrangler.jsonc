@@ -42,8 +42,7 @@
     "required": [
       "ADMIN_USERNAME",
       "ADMIN_PASSWORD",
-      "ADMIN_SESSION_SECRET",
-      "RESEND_API_KEY"
+      "ADMIN_SESSION_SECRET"
     ]
   },
   "observability": {

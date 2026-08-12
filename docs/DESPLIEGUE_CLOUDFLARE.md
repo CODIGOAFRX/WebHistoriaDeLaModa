@@ -141,7 +141,12 @@ valores en `wrangler.jsonc`, GitHub, una captura o este documento.
 1. En Resend, añade y verifica `historiadelamoda.net`.
 2. Añade en Cloudflare DNS exactamente los registros TXT/DKIM/SPF que entregue
    Resend; no inventes sus valores.
-3. Crea una API key y guárdala como `RESEND_API_KEY` en `.env.production`.
+3. Cuando vayas a activar el formulario, crea una API key y guárdala como
+   `RESEND_API_KEY` en `.env.production`.
+
+`RESEND_API_KEY` es opcional durante el primer despliegue. Mientras no exista,
+el formulario responde de forma controlada indicando que el envío automático
+no está configurado; el resto de la web continúa funcionando normalmente.
 
 El remitente ya está configurado como
 `Historia de la Moda <contacto@historiadelamoda.net>` y los mensajes llegan a

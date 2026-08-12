@@ -44,7 +44,6 @@ for (const [key, value] of [
   ["ADMIN_USERNAME", username],
   ["ADMIN_PASSWORD", password],
   ["ADMIN_SESSION_SECRET", sessionSecret],
-  ["RESEND_API_KEY", resendKey],
 ]) {
   if (!value || placeholders.includes(value)) {
     throw new Error(`${key} conserva un valor vacío o de ejemplo en .env.production.`);
@@ -66,7 +65,12 @@ if (
 if (sessionSecret.length < 48) {
   throw new Error("ADMIN_SESSION_SECRET debe contener al menos 48 caracteres aleatorios.");
 }
-if (!resendKey.startsWith("re_") || resendKey.length < 20) {
+if (
+  resendKey &&
+  (placeholders.includes(resendKey) ||
+    !resendKey.startsWith("re_") ||
+    resendKey.length < 20)
+) {
   throw new Error("RESEND_API_KEY no tiene el formato esperado de una clave real de Resend.");
 }
 

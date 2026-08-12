@@ -338,7 +338,13 @@ before(async () => {
     [vinextCli, "start", "--hostname", "127.0.0.1", "--port", String(port)],
     {
       cwd: projectRoot,
-      env: { ...process.env, NODE_ENV: "production" },
+      env: {
+        ...process.env,
+        NODE_ENV: "production",
+        ADMIN_USERNAME: "admin",
+        ADMIN_PASSWORD: "admin",
+        ADMIN_SESSION_SECRET: "browser-qa-session-secret-that-never-reaches-production",
+      },
       stdio: ["ignore", "pipe", "pipe"],
       windowsHide: true,
     },
