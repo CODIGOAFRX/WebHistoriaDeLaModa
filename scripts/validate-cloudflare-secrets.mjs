@@ -51,11 +51,17 @@ for (const [key, value] of [
   }
 }
 
-if (username.toLowerCase() === "admin" || username.length < 8) {
-  throw new Error("ADMIN_USERNAME debe ser distinto de admin y tener al menos 8 caracteres.");
+if (username.length < 3) {
+  throw new Error("ADMIN_USERNAME debe tener al menos 3 caracteres.");
 }
-if (password.toLowerCase() === "admin" || password.length < 16) {
-  throw new Error("ADMIN_PASSWORD debe ser único y tener al menos 16 caracteres.");
+if (
+  password.toLowerCase() === "admin" ||
+  password.toLowerCase() === username.toLowerCase() ||
+  password.length < 12
+) {
+  throw new Error(
+    "ADMIN_PASSWORD debe ser distinta del usuario y tener al menos 12 caracteres.",
+  );
 }
 if (sessionSecret.length < 48) {
   throw new Error("ADMIN_SESSION_SECRET debe contener al menos 48 caracteres aleatorios.");
