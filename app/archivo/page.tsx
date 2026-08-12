@@ -22,18 +22,6 @@ const featuredMedia = [
       "Carlos participa en el estreno del programa conducido por Silvia Intxaurrondo.",
   },
   {
-    outlet: "Canal Sur · Andalucía es moda",
-    title: "Historia de la Moda",
-    year: "2024–2025",
-    kind: "Serie · 12 capítulos",
-    href: "https://www.canalsur.es/television/andalucia-es-moda/",
-    image:
-      "https://static.canalsur.es/clip/eae0007c-845e-494f-94f7-0891c013e912_facebook-aspect-ratio_default_0.jpg",
-    imageAlt: "Imagen oficial del programa Andalucía es moda de Canal Sur",
-    description:
-      "Sección fija de Carlos dentro del programa presentado por Laura Sánchez. La serie reúne 12 capítulos; el archivo enlaza las 10 entregas verificadas.",
-  },
-  {
     outlet: "Canal Sur · La Memoria",
     title: "Indumentaria, moda, evolución y género",
     year: "2023",
@@ -46,106 +34,43 @@ const featuredMedia = [
   },
   {
     outlet: "Canal Sur · Andalucía es moda",
-    title: "La historia de Barbie, musa de los grandes diseñadores",
-    year: "2024",
-    kind: "Capítulo",
-    href: "https://www.canalsur.es/television/andalucia-es-moda/historia-barbie-musa-mejores-disenadores_1_1303458.html",
+    title: "Historia de la Moda",
+    year: "2024–2025",
+    kind: "Serie · 12 capítulos",
+    href: "https://www.canalsur.es/television/andalucia-es-moda/",
     image:
-      "https://static.canalsur.es/clip/e7056805-521b-4314-8d09-e86ba3b00098_facebook-aspect-ratio_default_0.jpg",
-    imageAlt: "Miniatura oficial del capítulo sobre Barbie en Andalucía es moda",
+      "https://static.canalsur.es/clip/eae0007c-845e-494f-94f7-0891c013e912_facebook-aspect-ratio_default_0.jpg",
+    imageAlt: "Imagen oficial del programa Andalucía es moda de Canal Sur",
     description:
-      "Una de las entregas de la sección Historia de la Moda, disponible en Canal Sur.",
+      "Sección fija de Carlos dentro del programa presentado por Laura Sánchez. La serie reúne 12 capítulos.",
+  },
+  {
+    outlet: "Granada TV",
+    title: "La historia de la moda",
+    year: "2023",
+    kind: "Entrevista",
+    href: "https://www.youtube.com/watch?v=g7bMLUH5QI0",
+    image: "https://i.ytimg.com/vi/g7bMLUH5QI0/hqdefault.jpg",
+    imageAlt: "Carlos Sánchez de Medina en Granada TV hablando sobre historia de la moda",
+    description:
+      "Una entrevista sobre la historia de la moda y su dimensión cultural.",
   },
 ] as const;
 
-const secondaryMedia = [
-  {
-    outlet: "La Vanguardia",
-    title: "Agonía y ocaso del zapato",
-    year: "2026",
-    href: "https://www.lavanguardia.com/vida/20260322/11495827/agonia-ocaso-zapato.html",
-  },
+const archiveCollaborations = [
+  ...collaborations,
   {
     outlet: "El Confidencial · Pausa",
     title: "Tacones, corsés y cómo vestiremos",
     year: "2023",
+    kind: "Podcast",
     href: "https://www.elconfidencial.com/espana/2023-09-28/pausa-podcast-tacones-corses-vestiremos_3743282/",
   },
 ] as const;
 
-const institutions = [
-  {
-    place: "Estación Diseño · Escuela Superior de Diseño",
-    role: "Fundador, dirección académica, jefatura de estudios y docencia",
-  },
-  {
-    place: "ELLE Education · Universidad Camilo José Cela",
-    role: "Docencia en Historia de la Moda",
-  },
-  {
-    place: "ESCO · Escuela Superior de Comunicación y Marketing de Granada",
-    role: "Dirección académica de grados universitarios y docencia",
-  },
-  {
-    place: "Escuela de Dirección y Altos Estudios (EDIAE) · Cámara Granada",
-    role: "Docencia en Historia del Lujo",
-  },
-  {
-    place: "Universidad de Almería",
-    role: "Conferencia sobre indumentaria y pintura",
-  },
-  {
-    place: "Escuela de Arte y Superior de Diseño Carlos Pérez Siquier · Almería",
-    role: "Conferencias sobre indumentaria, arte y cultura visual",
-  },
-  {
-    place: "Universidad de Málaga",
-    role: "Conferencias sobre diseño e indumentaria",
-  },
-  {
-    place: "Museo Automovilístico y de la Moda de Málaga",
-    role: "Masterclasses de Historia de la Moda",
-  },
-  {
-    place: "Universidad de Extremadura",
-    role: "Docencia y conferencias sobre creatividad y proyectos",
-  },
-  {
-    place: "UPAEP · Universidad Popular Autónoma del Estado de Puebla, México",
-    role: "Conferencia sobre arte y moda",
-  },
-];
-
 const fullArchive = [
   {
-    title: "Publicaciones",
-    items: [
-      ["Artículo académico en Dialnet", "https://dialnet.unirioja.es/servlet/articulo?codigo=8248793"],
-      ["La madeja infinita · Catálogo Ángeles Agrela", "https://files.cargocollective.com/c783562/AGRELA-19-ALCOBENDAS.pdf"],
-      ["La madeja infinita · consulta online", "https://es.slideshare.net/slideshow/la-madeja-infinita-el-cuerpo-en-la-mirada-angeles-agrela-catalogo-pdf/281474367"],
-    ],
-  },
-  {
-    title: "Dirección de arte",
-    items: [
-      ["Editorial Escuela Española · Emilio López", "https://www.thefashionroute.com/Editoriales-moda/Editorial-Escuela-Espanola-by-Emilio-Lopez.html"],
-      ["Editorial Compañía Laseda · Kiko Lozano", "https://kluidmagazine.com/editoriales/descubre-la-editorial-compañia-laseda-por-kiko-lozano/"],
-    ],
-  },
-  {
-    title: "Entrevistas",
-    items: [
-      ["Un intelectual en la moda · La Guía de Moda", "https://laguiademoda.com/entrevistas-inspiradoras/un-intelectual-en-la-moda-carlos-sanchez-de-medina-alcina/"],
-      ["Entrevista audiovisual 01", "https://www.youtube.com/watch?v=OUux1zjyXdc"],
-      ["La Memoria · Canal Sur Más", "https://www.canalsurmas.es/videos/detail/76072-la-memoria-27052023"],
-      ["Entrevista audiovisual 02", "https://www.youtube.com/watch?v=g7bMLUH5QI0"],
-      ["Entrevista audiovisual 03", "https://www.youtube.com/watch?v=oG2L8WsluGc&t=645s"],
-      ["Entrevista audiovisual 04", "https://www.youtube.com/watch?v=kND6J93eFaA&list=PLZkzby6iVML5heKK8z2HAg6YZsawcQ4X1&index=25&t=904s"],
-      ["Entrevista en Cadena SER", "https://cadenaser.com/audio/1784274475687/"],
-    ],
-  },
-  {
-    title: "Historia de la Moda · Andalucía es moda · 10 capítulos disponibles",
+    title: "Historia de la Moda · Andalucía es moda",
     items: [
       ["Mariano Fortuny", "https://www.youtube.com/watch?v=PAYH7oEPRLA"],
       ["La moda transforma el cuerpo", "https://www.youtube.com/watch?v=zxyUOM7M3pI"],
@@ -160,14 +85,34 @@ const fullArchive = [
     ],
   },
   {
+    title: "Publicaciones",
+    items: [
+      ["Artículo académico en Dialnet", "https://dialnet.unirioja.es/servlet/articulo?codigo=8248793"],
+      ["La madeja infinita · Catálogo Ángeles Agrela", "https://files.cargocollective.com/c783562/AGRELA-19-ALCOBENDAS.pdf"],
+    ],
+  },
+  {
+    title: "Entrevistas",
+    items: [
+      ["Ya no queremos Versace", "https://www.youtube.com/watch?v=kND6J93eFaA&list=PLZkzby6iVML5heKK8z2HAg6YZsawcQ4X1&index=25&t=904s"],
+      ["Entrevista en Cadena SER", "https://cadenaser.com/audio/1784274475687/"],
+      ["La historia de los pantalones vaqueros · Más de uno (Onda Cero)", "https://www.youtube.com/watch?v=eZGq2_RdGQ4"],
+      ["La moda está en su peor momento", "https://www.youtube.com/watch?v=oG2L8WsluGc&t=645s"],
+      ["Granada TV, la historia de la moda", "https://www.youtube.com/watch?v=g7bMLUH5QI0"],
+      ["La Memoria · Canal Sur Más", "https://www.canalsurmas.es/videos/detail/76072-la-memoria-27052023"],
+      ["Un intelectual en la moda · La Guía de Moda", "https://laguiademoda.com/entrevistas-inspiradoras/un-intelectual-en-la-moda-carlos-sanchez-de-medina-alcina/"],
+      ["Cómo se estudiará el auge de los influencers en la historia de la moda", "https://www.youtube.com/watch?v=OUux1zjyXdc"],
+    ],
+  },
+  {
     title: "Documentales y directos",
     items: [
       ["Documental · Archivo audiovisual", "https://www.youtube.com/watch?v=NBmyPMqVPHY"],
       ["Geópolis · RTVE", "https://www.rtve.es/television/20240411/geopolis-geopolitica-cosmetica/16053583.shtml"],
-      ["Directo 01", "https://www.youtube.com/watch?v=wZPdEUWGKQU&t=1559s"],
-      ["Directo 02", "https://www.youtube.com/watch?v=45hwEC5ov04&t=20s"],
-      ["Directo 03", "https://www.youtube.com/watch?v=duf4HO6-Rco&t=67s"],
-      ["Directo 04", "https://www.youtube.com/watch?v=5YFcllR0nHo&t=9s"],
+      ["Schiaparelli versus Chanel, con Anita Ruiz", "https://www.youtube.com/watch?v=wZPdEUWGKQU&t=1559s"],
+      ["La top model de los 90 con Andy Esmoda", "https://www.youtube.com/watch?v=45hwEC5ov04&t=20s"],
+      ["Hablando de moda con Pedro Mansilla", "https://www.youtube.com/watch?v=duf4HO6-Rco&t=67s"],
+      ["Hablando de moda con Erea Louro", "https://www.youtube.com/watch?v=5YFcllR0nHo&t=9s"],
     ],
   },
   {
@@ -176,7 +121,6 @@ const fullArchive = [
       ["El País ICON · Un hombre con abanico", "https://elpais.com/icon/2025-08-10/un-hombre-con-abanico-pierde-su-masculinidad-fragil-por-que-sigue-siendo-un-complemento-asociado-a-lo-femenino.html"],
       ["¡HOLA! Fashion · Estética flapper", "https://www.hola.com/fashion/tendencias/2022011272771/estetica-flapper-vestidos-flecos/"],
       ["El País S Moda · Ray-Ban Wayfarer", "https://elpais.com/smoda/moda/historia-ray-ban-wayfarer-disenador-invencion-20-grados-inclinacion.html"],
-      ["El Confidencial · Tacones, corsés y cómo vestiremos", "https://www.elconfidencial.com/espana/2023-09-28/pausa-podcast-tacones-corses-vestiremos_3743282/"],
       ["Glamour · Vestidos con volumen", "https://www.glamour.es/articulos/vestidos-volumen-falda-tendencia-cancan"],
       ["Clara · Letizia y doña Sofía", "https://www.clara.es/celebrities/asi-rompio-letizia-camino-impuesto-por-dona-sofia-hace-10-anos-su-golpe-efecto-proclamacion-felipe-vi_35781"],
       ["La Vanguardia · Agonía y ocaso del zapato", "https://www.lavanguardia.com/vida/20260322/11495827/agonia-ocaso-zapato.html"],
@@ -185,6 +129,13 @@ const fullArchive = [
       ["Cervezas Alhambra · Divulgación en redes", "https://www.cervezasalhambra.com/es/mirador/creadores/divulgacion-redes-sociales-impacto-educacion"],
       ["Cadena SER · Mes de la Moda", "https://cadenaser.com/andalucia/2026/04/07/el-mam-da-el-pistoletazo-de-salida-al-mes-de-la-moda-con-un-cartel-que-conecta-talento-industria-y-cultura-ser-malaga/"],
       ["EASD Alcoi · Guía docente", "https://www.easdalcoi.es/wp-content/uploads/guiesdocents_2425/disseny_moda/3/M3%20ESTE%CC%80TICA%20I%20TENDE%CC%80NCIES%20CONTEMPORA%CC%80NIES%20DEL%20DISSENY%20DE%20MODA%20I%20TE%CC%80XTIL.pdf"],
+    ],
+  },
+  {
+    title: "Dirección de arte",
+    items: [
+      ["Editorial Escuela Española · Emilio López", "https://www.thefashionroute.com/Editoriales-moda/Editorial-Escuela-Espanola-by-Emilio-Lopez.html"],
+      ["Editorial Compañía Laseda · Kiko Lozano", "https://kluidmagazine.com/editoriales/descubre-la-editorial-compan%cc%83ia-laseda-por-kiko-lozano/"],
     ],
   },
 ];
@@ -203,7 +154,7 @@ export default function ArchivePage() {
       <section className="media-feature shell section-pad">
         <div className="media-feature-heading">
           <p className="eyebrow">Selección destacada</p>
-          <h2>En los medios.</h2>
+          <h2>En la televisión.</h2>
           <p>Televisión, prensa y radio para llevar contexto a la conversación pública.</p>
         </div>
 
@@ -224,50 +175,6 @@ export default function ArchivePage() {
           ))}
         </div>
 
-        <div className="media-secondary" aria-labelledby="secondary-media-title">
-          <div>
-            <p className="eyebrow">Prensa y audio</p>
-            <h3 id="secondary-media-title">Más apariciones.</h3>
-          </div>
-          <div className="media-secondary-links">
-            {secondaryMedia.map((item) => (
-              <a href={item.href} target="_blank" rel="noreferrer" key={item.href}>
-                <span>{item.outlet}</span>
-                <strong>{item.title}</strong>
-                <small>{item.year}</small>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="trajectory-section">
-        <div className="shell section-pad-sm">
-          <div className="trajectory-heading">
-            <p className="eyebrow">Trayectoria académica</p>
-            <p>
-              Historiador del arte e investigador, Carlos desarrolla su práctica entre
-              la docencia, la dirección académica, la cultura visual y la divulgación.
-            </p>
-          </div>
-
-          <div className="timeline-list">
-            {institutions.map((entry, index) => (
-              <Reveal className="timeline-entry" key={entry.place} delay={(index % 4) * 45}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <h3>{entry.place}</h3>
-                <p>{entry.role}</p>
-              </Reveal>
-            ))}
-          </div>
-
-          <div className="trajectory-facts">
-            <div><strong>20</strong><span>años dedicados a la educación</span></div>
-            <div><strong>35</strong><span>asignaturas impartidas</span></div>
-            <div><strong>15</strong><span>conferencias seleccionadas</span></div>
-            <div><strong>12</strong><span>ediciones de eventos coordinadas</span></div>
-          </div>
-        </div>
       </section>
 
       <section id="colaboraciones" className="collaboration-section shell section-pad">
@@ -278,7 +185,7 @@ export default function ArchivePage() {
         </div>
 
         <div className="collaboration-list">
-          {collaborations.map((item, index) => (
+          {archiveCollaborations.map((item, index) => (
             <Reveal as="article" className="collaboration-item" key={item.href} delay={(index % 3) * 45}>
               <a href={item.href} target="_blank" rel="noreferrer">
                 <span>{String(index + 1).padStart(2, "0")}</span>

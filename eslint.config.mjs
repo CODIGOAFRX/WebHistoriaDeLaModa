@@ -35,6 +35,11 @@ const eslintConfig = defineConfig([
         version: "detect",
       },
     },
+    rules: {
+      // Vinext beta's next/link client runtime currently throws during navigation.
+      // Native anchors keep every internal route usable until that runtime is fixed.
+      "@next/next/no-html-link-for-pages": "off",
+    },
   },
 ]);
 

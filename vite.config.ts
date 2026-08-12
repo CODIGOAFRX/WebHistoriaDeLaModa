@@ -37,6 +37,11 @@ const localBindingConfig = {
       namespace_id: "8112026",
       simple: { limit: 3, period: 60 as const },
     },
+    {
+      name: "ADMIN_LOGIN_RATE_LIMITER",
+      namespace_id: "12082026",
+      simple: { limit: 8, period: 60 as const },
+    },
   ],
 };
 

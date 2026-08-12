@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 
 type FormStatus =
   | { state: "idle" }
@@ -10,11 +10,13 @@ type FormStatus =
 
 export function ContactForm() {
   const [status, setStatus] = useState<FormStatus>({ state: "idle" });
+  const submissionId = useRef<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const values = new FormData(form);
+    submissionId.current ??= crypto.randomUUID();
     setStatus({ state: "sending" });
 
     try {
@@ -29,9 +31,10 @@ export function ContactForm() {
           message: values.get("message"),
           website: values.get("website"),
           consent: values.get("consent") === "yes",
+          submissionId: submissionId.current,
         }),
       });
-      const result = (await response.json()) as { error?: string };
+      const result = (await response.json().catch(() => ({}))) as { error?: string };
       if (!response.ok) {
         setStatus({
           state: "error",
@@ -41,6 +44,7 @@ export function ContactForm() {
       }
 
       form.reset();
+      submissionId.current = null;
       setStatus({
         state: "success",
         message: "Mensaje enviado. Gracias; te responderemos por correo.",
@@ -55,7 +59,19 @@ export function ContactForm() {
   }
 
   return (
-    <form className="contact-form" onSubmit={submit} noValidate={false}>
+    <form
+      className="contact-form"
+      onSubmit={submit}
+      onInput={() => {
+        if (status.state === "error" || status.state === "success") {
+          if (status.state === "error") submissionId.current = null;
+          setStatus({ state: "idle" });
+        }
+      }}
+      aria-busy={status.state === "sending"}
+      noValidate={false}
+    >
+      <fieldset disabled={status.state === "sending"}>
       <div className="contact-field">
         <label htmlFor="contact-name">Nombre y apellidos</label>
         <input
@@ -120,13 +136,14 @@ export function ContactForm() {
         <span>Autorizo el uso de estos datos únicamente para responder a mi consulta.</span>
       </label>
       <div className="contact-submit-row">
-        <button className="button-link" type="submit" disabled={status.state === "sending"}>
+        <button className="button-link" type="submit">
           {status.state === "sending" ? "Enviando…" : "Enviar mensaje"}
         </button>
         <a className="text-link" href="mailto:demedinamoda@gmail.com">
           demedinamoda@gmail.com
         </a>
       </div>
+      </fieldset>
       {status.state === "success" ? (
         <p className="contact-status is-success" role="status">{status.message}</p>
       ) : null}

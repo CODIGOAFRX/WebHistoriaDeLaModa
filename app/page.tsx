@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Reveal } from "./components/Reveal";
 import { SectionHeading } from "./components/SectionHeading";
 import { SocialLinks } from "./components/SocialLinks";
@@ -24,7 +23,7 @@ const paths = [
     label: "Podcast",
     text: "Relatos que recorren nombres, objetos y gestos que cambiaron nuestra manera de vestir.",
     href: "/podcasts",
-    image: "/images/podcasts/01-balenciaga.webp",
+    image: "/images/podcasts/00-serie-alt.webp",
   },
   {
     index: "02",
@@ -47,14 +46,14 @@ const paths = [
 const institutions = [
   "Estación Diseño · Escuela Superior de Diseño",
   "ELLE Education · Universidad Camilo José Cela",
-  "ESCO · Escuela Superior de Comunicación y Marketing de Granada",
-  "Escuela de Dirección y Altos Estudios (EDIAE) · Cámara Granada",
   "Universidad de Almería",
-  "Escuela de Arte y Superior de Diseño Carlos Pérez Siquier · Almería",
   "Universidad de Málaga",
-  "Museo Automovilístico y de la Moda de Málaga",
   "Universidad de Extremadura",
   "UPAEP · Universidad Popular Autónoma del Estado de Puebla, México",
+  "Escuela de Dirección y Altos Estudios (EDIAE) · Cámara Granada",
+  "Escuela de Arte y Superior de Diseño Carlos Pérez Siquier · Almería",
+  "Museo Automovilístico y de la Moda de Málaga",
+  "ESCO · Escuela Superior de Comunicación y Marketing de Granada",
 ];
 
 export default function Home() {
@@ -73,7 +72,7 @@ export default function Home() {
           </p>
           <div className="home-hero-actions">
             <a className="button-link" href="#historia">
-              Conoce a Carlos <span aria-hidden="true">↓</span>
+              Conoce a Carlos
             </a>
             <a
               className="text-link"
@@ -121,7 +120,7 @@ export default function Home() {
         aria-labelledby="about-title"
       >
         <div className="about-intro">
-          <p className="eyebrow">Historiador del arte e investigador</p>
+          <p className="eyebrow">Quién soy</p>
           <h2 id="about-title">Carlos Sánchez de Medina Alcina</h2>
         </div>
 
@@ -139,7 +138,8 @@ export default function Home() {
 
           <Reveal className="about-copy" delay={80}>
             <p className="about-lead">
-              Estudia la indumentaria y la moda como documentos culturales: expresiones
+              Historiador del arte e investigador. Estudia la indumentaria y la moda como
+              documentos culturales, expresiones
               de su contexto histórico, artístico y social.
             </p>
             <div className="about-columns">
@@ -231,40 +231,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="book-section">
-        <div className="shell book-grid">
-          <Reveal className="book-object">
-            <div className="book-spine">Carlos Sánchez de Medina</div>
-            <div className="book-cover">
-              <span>Próximamente</span>
-              <h2 className="book-title-lines" aria-label="Cómo reconocer un Chanel">
-                <span aria-hidden="true">Cómo</span>
-                <span aria-hidden="true">reconocer</span>
-                <span aria-hidden="true">un</span>
-                <span aria-hidden="true">Chanel</span>
-              </h2>
-              <div className="book-cover-mark">HM</div>
-              <p>Temas de Hoy</p>
-            </div>
-          </Reveal>
-
-          <Reveal className="book-copy" delay={100}>
-            <p className="eyebrow">En proceso de escritura</p>
-            <h2>Una historia de la moda para leerla de otra manera.</h2>
-            <p>
-              <em>Cómo reconocer un Chanel</em> es el nuevo libro de Carlos: una
-              invitación a reconocer las claves, los símbolos y las historias que
-              han construido el imaginario de la moda.
-            </p>
-            <div className="book-publisher">
-              <span>Temas de Hoy</span>
-              <span>Grupo Planeta</span>
-            </div>
-            <Link className="button-link" href="/biblioteca">Explorar la biblioteca</Link>
-          </Reveal>
-        </div>
-      </section>
-
       <section className="featured-media shell section-pad">
         <SectionHeading
           eyebrow="En primera persona"
@@ -316,7 +282,7 @@ export default function Home() {
             Una escuela online en construcción para estudiar la moda con contexto,
             método y una buena historia detrás.
           </p>
-          <Link className="button-link is-light" href="/escuela">Conocer el aula</Link>
+          <a className="button-link is-light" href="/escuela">Conocer el aula</a>
         </Reveal>
       </section>
     </>

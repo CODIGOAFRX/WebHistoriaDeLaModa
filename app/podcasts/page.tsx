@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageIntro } from "../components/PageIntro";
 import { Reveal } from "../components/Reveal";
 import { podcastEpisodes } from "../data/content";
@@ -76,9 +75,9 @@ export default function PodcastsPage() {
           Una conversación sobre moda puede empezar en Balenciaga, atravesar una
           guillotina y terminar preguntándonos quién decide hoy lo que deseamos.
         </p>
-        <Link className="text-link" href="/archivo#colaboraciones">
+        <a className="text-link" href="/archivo#colaboraciones">
           Podcasts invitados y entrevistas
-        </Link>
+        </a>
       </section>
     </>
   );

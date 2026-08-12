@@ -9,11 +9,12 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
-    "test": "npm run build && npm run test:unit && node --test tests/browser-responsive.test.mjs",
+    "test": "npm run build && npm run test:unit && node --test tests/browser-responsive.test.mjs && npm run test:admin-ui",
     "test:unit": "npm run test:auth && npm run test:contact && node --test tests/rendered-html.test.mjs tests/content-contract.test.mjs",
     "test:browser": "npm run build && node --test tests/browser-responsive.test.mjs",
     "test:auth": "node --experimental-strip-types --test tests/admin-auth.test.mjs",
     "test:contact": "node --experimental-strip-types --test tests/contact-form.test.mjs",
+    "test:admin-ui": "node --test tests/admin-crud-browser.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },

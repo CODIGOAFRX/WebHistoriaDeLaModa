@@ -141,25 +141,6 @@ const INITIAL_STATEMENTS: readonly InitialStatement[] = [
       "CREATE INDEX IF NOT EXISTS courses_admin_order_idx ON courses (sort_order, id)",
   },
   {
-    query: `INSERT OR IGNORE INTO books
-      (title, slug, description, image_url, category, author, sort_order, price_cents, status)
-      SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
-      WHERE NOT EXISTS (
-        SELECT 1 FROM content_setup WHERE key = 'seed_version'
-      )`,
-    values: [
-      "Cómo reconocer un Chanel",
-      "como-reconocer-un-chanel",
-      "Una historia de la moda para aprender a mirar. Próximamente con Temas de Hoy, sello de Grupo Planeta.",
-      "",
-      "Próximamente",
-      "Carlos Sánchez de Medina",
-      10,
-      0,
-      "published",
-    ],
-  },
-  {
     query: `INSERT OR IGNORE INTO courses
       (title, slug, description, image_url, category, author, sort_order, price_cents, status, scorm_url)
       SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
@@ -180,31 +161,26 @@ const INITIAL_STATEMENTS: readonly InitialStatement[] = [
     ],
   },
   {
-    query:
-      "INSERT OR IGNORE INTO content_setup (key, value) VALUES ('seed_version', '1')",
+    query: `DELETE FROM books
+      WHERE id = 1
+        AND category = ?
+        AND sort_order = 10
+        AND price_cents = 0
+        AND EXISTS (
+          SELECT 1 FROM content_setup
+          WHERE key = 'seed_version' AND value = '1'
+        )`,
+    values: ["Próximamente"],
+  },
+  {
+    query: `INSERT INTO content_setup (key, value)
+      VALUES ('seed_version', '2')
+      ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
   },
   { query: "PRAGMA optimize" },
 ] as const;
 
-const FALLBACK_NOW = "2026-01-01 00:00:00";
-
-export const FALLBACK_BOOKS: readonly BookRecord[] = [
-  {
-    id: 0,
-    title: "Cómo reconocer un Chanel",
-    slug: "como-reconocer-un-chanel",
-    description:
-      "Una historia de la moda para aprender a mirar. Próximamente con Temas de Hoy, sello de Grupo Planeta.",
-    imageUrl: "",
-    category: "Próximamente",
-    author: "Carlos Sánchez de Medina",
-    sortOrder: 10,
-    priceCents: 0,
-    status: "published",
-    createdAt: FALLBACK_NOW,
-    updatedAt: FALLBACK_NOW,
-  },
-] as const;
+export const FALLBACK_BOOKS: readonly BookRecord[] = [];
 
 export const FALLBACK_COURSES: readonly CourseRecord[] = [];
 

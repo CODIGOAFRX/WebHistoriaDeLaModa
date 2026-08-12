@@ -73,6 +73,7 @@ export function AdminStudio({
   );
 
   function selectKind(kind: ContentKind) {
+    if (busy) return;
     const count = kind === "book" ? books.length : courses.length;
     setActiveKind(kind);
     setEditingId(null);
@@ -81,6 +82,7 @@ export function AdminStudio({
   }
 
   function startCreate() {
+    if (busy) return;
     setEditingId(null);
     setForm(emptyForm(activeKind, items.length));
     setFeedback(null);
@@ -88,6 +90,7 @@ export function AdminStudio({
   }
 
   function startEdit(item: BookRecord | CourseRecord) {
+    if (busy) return;
     setEditingId(item.id);
     setForm({
       title: item.title,
@@ -285,7 +288,11 @@ export function AdminStudio({
             <strong>{viewer.displayName}</strong>
             <small>{localQa ? "Sesión de QA en localhost" : viewer.email}</small>
           </span>
-          {signOutUrl ? <a href={signOutUrl}>Cerrar sesión</a> : null}
+          {signOutUrl ? (
+            <form action={signOutUrl} method="post">
+              <button type="submit">Cerrar sesión</button>
+            </form>
+          ) : null}
         </div>
       </header>
 
@@ -307,6 +314,7 @@ export function AdminStudio({
           type="button"
           className={activeKind === "book" ? styles.activeTab : undefined}
           aria-pressed={activeKind === "book"}
+          disabled={busy !== null}
           onClick={() => selectKind("book")}
         >
           <span>Biblioteca</span>
@@ -316,6 +324,7 @@ export function AdminStudio({
           type="button"
           className={activeKind === "course" ? styles.activeTab : undefined}
           aria-pressed={activeKind === "course"}
+          disabled={busy !== null}
           onClick={() => selectKind("course")}
         >
           <span>Cursos</span>
@@ -359,7 +368,12 @@ export function AdminStudio({
               </h2>
             </div>
             {editingId ? (
-              <button type="button" className={styles.textButton} onClick={startCreate}>
+              <button
+                type="button"
+                className={styles.textButton}
+                onClick={startCreate}
+                disabled={busy !== null}
+              >
                 Cancelar
               </button>
             ) : null}
@@ -369,6 +383,7 @@ export function AdminStudio({
             <label className={styles.fullField}>
               <span>Título *</span>
               <input
+                id="admin-content-title"
                 name="title"
                 value={form.title}
                 onChange={(event) =>
@@ -623,11 +638,17 @@ export function AdminStudio({
                   </div>
 
                   <div className={styles.cardActions}>
-                    <button type="button" onClick={() => startEdit(item)}>
+                    <button
+                      type="button"
+                      aria-label={`Editar ${item.title}`}
+                      onClick={() => startEdit(item)}
+                      disabled={busy !== null}
+                    >
                       Editar
                     </button>
                     <button
                       type="button"
+                      aria-label={`${item.status === "published" ? "Retirar" : "Publicar"} ${item.title}`}
                       onClick={() => togglePublished(item)}
                       disabled={!storageReady || busy !== null}
                     >
@@ -640,6 +661,7 @@ export function AdminStudio({
                     <button
                       type="button"
                       className={styles.dangerButton}
+                      aria-label={`Eliminar ${item.title}`}
                       onClick={() => removeItem(item)}
                       disabled={!storageReady || busy !== null}
                     >
@@ -690,11 +712,17 @@ function initials(value: string): string {
 
 function focusEditor() {
   window.setTimeout(() => {
-    document.getElementById("admin-editor")?.scrollIntoView({
-      behavior: "smooth",
+    const editor = document.getElementById("admin-editor");
+    editor?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
       block: "start",
     });
-  }, 0);
+    document
+      .getElementById("admin-content-title")
+      ?.focus({ preventScroll: true });
+  }, 50);
 }
 
 async function requestJson<T = unknown>(

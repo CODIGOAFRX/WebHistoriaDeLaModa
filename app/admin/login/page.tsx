@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getAdminSessionFromCookieHeader } from "../auth";
 import styles from "../admin.module.css";
 
@@ -25,7 +24,15 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
   if (existingSession) redirect("/admin");
 
   const query = searchParams ? await searchParams : {};
-  const hasError = query.error === "credentials";
+  const errorCode = typeof query.error === "string" ? query.error : "";
+  const errorMessage =
+    errorCode === "credentials"
+      ? "El usuario o la contraseña no son correctos."
+      : errorCode === "rate-limit"
+        ? "Demasiados intentos. Espera un minuto antes de volver a probar."
+        : errorCode === "unavailable"
+          ? "El acceso no está disponible temporalmente."
+          : "";
 
   return (
     <div className={styles.loginPage}>
@@ -62,9 +69,9 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
               required
             />
           </label>
-          {hasError ? (
+          {errorMessage ? (
             <p className={styles.loginError} role="alert">
-              El usuario o la contraseña no son correctos.
+              {errorMessage}
             </p>
           ) : null}
           <button type="submit">Entrar</button>
@@ -72,7 +79,7 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
 
         <div className={styles.loginFoot}>
           <p>Acceso provisional. Las credenciales se cambiarán antes de publicar.</p>
-          <Link href="/">Volver a la web</Link>
+          <a href="/">Volver a la web</a>
         </div>
       </section>
     </div>

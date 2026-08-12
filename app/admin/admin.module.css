@@ -105,12 +105,22 @@
   white-space: nowrap;
 }
 
-.account a {
+.account form {
   grid-column: 2;
+  margin: 0;
+}
+
+.account form button {
   width: fit-content;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
   color: var(--admin-ink);
+  background: transparent;
   font-size: 0.67rem;
+  text-decoration: underline;
   text-underline-offset: 0.2rem;
+  cursor: pointer;
 }
 
 .storageWarning {
@@ -787,6 +797,9 @@
 }
 
 .loginFoot a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   color: #171414;
   font-weight: 700;
   text-underline-offset: 0.2rem;

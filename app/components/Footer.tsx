@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export function Footer() {
   return (
     <footer className="site-footer">
@@ -14,7 +12,7 @@ export function Footer() {
         </p>
       </div>
       <div className="footer-links">
-        <Link href="/contacto">Contacto</Link>
+        <a href="/contacto">Contacto</a>
         <a
           href="https://www.instagram.com/historia_de_la_moda/"
           target="_blank"
@@ -29,7 +27,13 @@ export function Footer() {
         >
           YouTube
         </a>
-        <Link href="/admin">Administración</Link>
+        <a
+          href="https://es.linkedin.com/in/carlos-s%C3%A1nchez-de-medina-alcina"
+          target="_blank"
+          rel="noreferrer"
+        >
+          LinkedIn
+        </a>
       </div>
       <div className="footer-legal">
         <span>© {new Date().getFullYear()} Historia de la Moda</span>

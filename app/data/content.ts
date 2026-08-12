@@ -60,7 +60,7 @@ export const podcastEpisodes: PodcastEpisode[] = [
     number: "08",
     title: "Del maniquí a la modelo",
     subtitle: "La aparición de una profesión que cambió la manera de mostrar moda.",
-    cover: "/images/podcasts/00-serie-alt.webp",
+    cover: "/images/podcasts/08-del-maniqui-a-la-modelo.webp",
     ivooxId: "167193782",
   },
   {

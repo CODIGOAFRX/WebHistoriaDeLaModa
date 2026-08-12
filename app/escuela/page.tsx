@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getPublicCourses } from "../../db/content";
 import { PageIntro } from "../components/PageIntro";
 import { Reveal } from "../components/Reveal";
@@ -123,13 +122,18 @@ export default async function SchoolPage() {
                   <h3>{course.title}</h3>
                   <p>{course.description}</p>
                   {course.scormUrl ? (
-                    <Link className="button-link" href={`/escuela/${course.slug}`}>
+                    <a
+                      className="button-link"
+                      href={`/escuela/${course.slug}`}
+                      aria-label={`Entrar al aula: ${course.title}`}
+                    >
                       Entrar al aula
-                    </Link>
+                    </a>
                   ) : (
                     <a
                       className="text-link"
                       href={`mailto:demedinamoda@gmail.com?subject=${encodeURIComponent(`Lista de espera: ${course.title}`)}`}
+                      aria-label={`Apuntarme a la lista: ${course.title}`}
                     >
                       Apuntarme a la lista
                     </a>

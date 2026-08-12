@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublicCourses } from "../../../db/content";
 
@@ -30,21 +29,27 @@ export default async function CoursePage({ params }: CoursePageProps) {
           <p className="eyebrow">Aula Historia de la Moda · {course.category}</p>
           <h1>{course.title}</h1>
         </div>
-        <Link className="text-link" href="/escuela">
+        <a className="text-link" href="/escuela">
           Volver al aula
-        </Link>
+        </a>
       </div>
 
       {course.scormUrl ? (
-        <div className="course-room-frame">
-          <iframe
-            title={`Curso ${course.title}`}
-            src={course.scormUrl}
-            allow="fullscreen"
-            allowFullScreen
-            sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
-          />
-        </div>
+        <>
+          <div className="course-room-frame">
+            <iframe
+              title={`Curso ${course.title}`}
+              src={course.scormUrl}
+              loading="lazy"
+              allow="fullscreen"
+              allowFullScreen
+              sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
+            />
+          </div>
+          <a className="text-link" href={course.scormUrl} target="_blank" rel="noreferrer">
+            Abrir el curso en una pestaña nueva
+          </a>
+        </>
       ) : (
         <div className="empty-state">
           <h2>Este curso todavía está en preparación.</h2>

@@ -91,6 +91,14 @@ export async function POST(request: Request) {
     );
   }
 
+  const submissionId = readSubmissionId(payload);
+  if (!submissionId) {
+    return Response.json(
+      { error: "No se ha podido identificar el envío. Recarga la página e inténtalo de nuevo." },
+      { status: 400, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.CONTACT_FROM_EMAIL?.trim();
   const to = process.env.CONTACT_TO_EMAIL?.trim() || "demedinamoda@gmail.com";
@@ -143,7 +151,7 @@ export async function POST(request: Request) {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "Idempotency-Key": crypto.randomUUID(),
+        "Idempotency-Key": `contact-${submissionId}`,
       },
       body: JSON.stringify({
         from,
@@ -178,4 +186,13 @@ export async function POST(request: Request) {
     { sent: true },
     { status: 201, headers: { "Cache-Control": "no-store" } },
   );
+}
+
+function readSubmissionId(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return null;
+  const value = (payload as Record<string, unknown>).submissionId;
+  if (typeof value !== "string") return null;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+    ? value
+    : null;
 }

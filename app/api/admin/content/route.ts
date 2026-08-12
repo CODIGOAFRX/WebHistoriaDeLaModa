@@ -215,7 +215,7 @@ function parseContentInput(
     status,
     scormUrl:
       kind === "course"
-        ? urlField(payload.scormUrl, "La URL de lanzamiento SCORM", true)
+        ? urlField(payload.scormUrl, "La URL de lanzamiento SCORM", true, true)
         : undefined,
   };
 }
@@ -260,7 +260,12 @@ function integerField(
   return value;
 }
 
-function urlField(value: unknown, label: string, allowRelative: boolean): string {
+function urlField(
+  value: unknown,
+  label: string,
+  allowRelative: boolean,
+  requireSecure = false,
+): string {
   const url = stringField(value, label, 2048);
   if (!url) return "";
 
@@ -275,12 +280,23 @@ function urlField(value: unknown, label: string, allowRelative: boolean): string
 
   try {
     const parsed = new URL(url);
-    if (parsed.protocol === "http:" || parsed.protocol === "https:") return url;
+    const localHttp =
+      parsed.protocol === "http:" &&
+      (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1");
+    if (
+      parsed.protocol === "https:" ||
+      (!requireSecure && parsed.protocol === "http:") ||
+      localHttp
+    ) {
+      return url;
+    }
   } catch {
     // Invalid URLs use the same user-facing error below.
   }
   throw new RequestValidationError(
-    `${label} debe usar http(s) o comenzar por «/».`,
+    requireSecure
+      ? `${label} debe usar HTTPS o comenzar por «/».`
+      : `${label} debe usar http(s) o comenzar por «/».`,
   );
 }
 

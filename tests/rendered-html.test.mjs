@@ -41,14 +41,26 @@ test("server-renders the finished Historia de la Moda homepage", async () => {
   assert.match(html, /La moda[\s\S]*tambi.n[\s\S]*se piensa/i);
   assert.match(html, /\+400\.000/);
   assert.match(html, /Carlos S.nchez de Medina Alcina/i);
-  assert.match(html, /Historiador del arte e investigador/i);
+  const aboutLead = html.match(/<p[^>]*class="about-lead"[^>]*>([\s\S]*?)<\/p>/i)?.[1] ?? "";
+  const normalizedAboutLead = aboutLead.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  assert.equal(
+    normalizedAboutLead,
+    "Historiador del arte e investigador. Estudia la indumentaria y la moda como documentos culturales, expresiones de su contexto histórico, artístico y social.",
+  );
   assert.match(html, /Granada[^<]*2026/i);
   assert.match(html, /\/images\/brand\/logo-wordmark-white\.png/);
   assert.match(html, /\/favicon\.ico/);
   for (const network of ["Instagram", "TikTok", "YouTube", "LinkedIn", "Spotify", "iVoox"]) {
     assert.match(html, new RegExp(`aria-label="Abrir ${network}`, "i"), network);
   }
+  const navigation = html.match(/<nav\b[^>]*id="site-navigation"[^>]*>[\s\S]*?<\/nav>/i)?.[0] ?? "";
+  assert.match(
+    navigation,
+    /Historia[\s\S]*Podcasts[\s\S]*Conferencias[\s\S]*Aula[\s\S]*Archivo[\s\S]*Biblioteca[\s\S]*Contacto/i,
+  );
+  assert.doesNotMatch(navigation, /Instagram/i);
   assert.match(html, /http:\/\/localhost\/og\.png/);
+  assert.doesNotMatch(html, /class="book-section"|book-title-lines|book-publisher/i);
   assert.doesNotMatch(
     html,
     /doctorando|licenciado|Madrid|Rigor sin distancia|Una imagen, una puerta|Conversaci.n abierta|\u2197/i,
@@ -60,9 +72,9 @@ test("renders all primary public routes", async () => {
   const expectations = [
     ["/podcasts", /Moda para escuchar/i],
     ["/conferencias", /Pensar en voz alta/i],
-    ["/biblioteca", /Leer para mirar mejor/i],
+    ["/biblioteca", /La biblioteca de Historia de la Moda/i],
     ["/escuela", /Aprender a mirar/i],
-    ["/archivo", /Todo lo que deja huella/i],
+    ["/archivo", /En la televisi.n/i],
     ["/contacto", /Hablemos/i],
   ];
 
@@ -112,6 +124,28 @@ test("contact endpoint validates requests and silently discards the honeypot", a
     }),
   });
   assert.equal(honeypot.status, 202);
+});
+
+test("logout only expires the admin session through a same-origin POST", async () => {
+  const readOnly = await render("/admin/logout");
+  assert.equal(readOnly.status, 303);
+  assert.match(readOnly.headers.get("location") ?? "", /\/admin$/);
+  assert.equal(readOnly.headers.get("set-cookie"), null);
+
+  const crossOrigin = await render("/admin/logout", {
+    method: "POST",
+    headers: { origin: "https://example.com" },
+  });
+  assert.equal(crossOrigin.status, 403);
+  assert.equal(crossOrigin.headers.get("set-cookie"), null);
+
+  const logout = await render("/admin/logout", {
+    method: "POST",
+    headers: { origin: "http://localhost" },
+  });
+  assert.equal(logout.status, 303);
+  assert.match(logout.headers.get("location") ?? "", /\/admin\/login$/);
+  assert.match(logout.headers.get("set-cookie") ?? "", /Max-Age=0/);
 });
 
 test("removes disposable starter assets and dependencies", async () => {

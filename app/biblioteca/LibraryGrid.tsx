@@ -31,18 +31,28 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
       return matchesCategory && matchesQuery;
     });
   }, [books, category, query]);
-  const placeholderCount =
-    category === "Todos" && !query.trim() ? Math.max(0, 5 - visible.length) : 0;
+
+  if (!books.length) {
+    return (
+      <div className="library-browser">
+        <div className="empty-state" role="status">
+          <h2>No hay libros publicados.</h2>
+          <p>Los títulos aparecerán aquí cuando se publiquen desde la administración.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="library-browser">
       <div className="library-tools">
-        <div className="library-filters" aria-label="Filtrar por categoría">
+        <div className="library-filters" role="group" aria-label="Filtrar por categoría">
           {categories.map((item) => (
             <button
               type="button"
               key={item}
               className={category === item ? "is-active" : undefined}
+              aria-pressed={category === item}
               onClick={() => setCategory(item)}
             >
               {item}
@@ -60,7 +70,7 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
         </label>
       </div>
 
-      {visible.length || placeholderCount ? (
+      {visible.length ? (
         <div className="book-grid-public">
           {visible.map((book, index) => (
             <article className="book-card-public" key={book.id}>
@@ -70,7 +80,7 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
                 ) : (
                   <>
                     <span>{book.category}</span>
-                    <h3>{book.title}</h3>
+                    <span className="book-card-cover-title">{book.title}</span>
                     <p>{book.author}</p>
                     <i aria-hidden="true">HM</i>
                   </>
@@ -78,31 +88,16 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
               </div>
               <div className="book-card-copy">
                 <p>{book.category}</p>
-                <h3>{book.title}</h3>
+                <h2>{book.title}</h2>
                 <span>{book.author}</span>
                 <p>{book.description}</p>
               </div>
             </article>
           ))}
-          {Array.from({ length: placeholderCount }, (_, index) => (
-            <article className="book-card-public is-placeholder" key={`placeholder-${index}`}>
-              <div className={`book-card-cover tone-${((visible.length + index) % 5) + 1}`}>
-                <span>Biblioteca abierta</span>
-                <h3>Próxima incorporación</h3>
-                <p>Selección y comentario de Carlos</p>
-                <i aria-hidden="true">+</i>
-              </div>
-              <div className="book-card-copy">
-                <p>En preparación</p>
-                <h3>Una estantería en crecimiento</h3>
-                <span>Nuevo título próximamente</span>
-              </div>
-            </article>
-          ))}
         </div>
       ) : (
-        <div className="empty-state">
-          <h3>No hay coincidencias.</h3>
+        <div className="empty-state" role="status" aria-live="polite">
+          <h2>No hay coincidencias.</h2>
           <p>Prueba con otra palabra o vuelve a ver todas las categorías.</p>
         </div>
       )}

@@ -15,7 +15,7 @@ export function PodcastArchive({ episodes }: { episodes: PodcastEpisode[] }) {
         </div>
         <div className="podcast-player-copy">
           <p className="eyebrow">Ahora escuchas · Episodio {active.number}</p>
-          <h2>{active.title}</h2>
+          <h2 tabIndex={-1}>{active.title}</h2>
           <p>{active.subtitle}</p>
           <iframe
             key={active.ivooxId}
@@ -35,18 +35,28 @@ export function PodcastArchive({ episodes }: { episodes: PodcastEpisode[] }) {
               className={`episode-card${selected ? " is-active" : ""}`}
               type="button"
               key={episode.ivooxId}
-              onClick={() => {
+              onClick={(event) => {
                 setActive(episode);
-                document.querySelector(".podcast-player")?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
+                window.requestAnimationFrame(() => {
+                  const player = document.querySelector<HTMLElement>(".podcast-player");
+                  player?.scrollIntoView({
+                    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                      ? "auto"
+                      : "smooth",
+                    block: "center",
+                  });
+                  if (event.detail === 0) {
+                    player
+                      ?.querySelector<HTMLElement>(".podcast-player-copy h2")
+                      ?.focus({ preventScroll: true });
+                  }
                 });
               }}
               aria-pressed={selected}
             >
               <span className="episode-cover">
                 <img src={episode.cover} alt="" loading="lazy" />
-                <i aria-hidden="true">{selected ? "Pausa" : "Escuchar"}</i>
+                <i aria-hidden="true">{selected ? "Seleccionado" : "Escuchar"}</i>
               </span>
               <span className="episode-meta">
                 <b>{episode.number}</b>
