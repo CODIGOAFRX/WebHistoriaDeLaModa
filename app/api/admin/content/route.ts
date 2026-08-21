@@ -1,7 +1,8 @@
 import {
-  getAdminSessionFromCookieHeader,
-  isLocalAdminHost,
-} from "@/app/admin/auth";
+  authorizeAdminRequest,
+  validateAdminWriteOrigin,
+} from "@/app/api/admin/authorization";
+import { deleteManagedMedia } from "@/app/media/storage";
 import {
   ContentStorageUnavailableError,
   createContent,
@@ -14,12 +15,8 @@ import {
 
 type JsonRecord = Record<string, unknown>;
 
-type AuthorizationResult =
-  | { allowed: true }
-  | { allowed: false; response: Response };
-
 export async function GET(request: Request) {
-  const authorization = await authorizeAdmin(request);
+  const authorization = await authorizeAdminRequest(request);
   if (!authorization.allowed) return authorization.response;
 
   try {
@@ -34,9 +31,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const authorization = await authorizeAdmin(request);
+  const authorization = await authorizeAdminRequest(request);
   if (!authorization.allowed) return authorization.response;
-  const originError = validateWriteOrigin(request);
+  const originError = validateAdminWriteOrigin(request);
   if (originError) return originError;
 
   try {
@@ -54,9 +51,9 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const authorization = await authorizeAdmin(request);
+  const authorization = await authorizeAdminRequest(request);
   if (!authorization.allowed) return authorization.response;
-  const originError = validateWriteOrigin(request);
+  const originError = validateAdminWriteOrigin(request);
   if (originError) return originError;
 
   try {
@@ -85,6 +82,9 @@ export async function PATCH(request: Request) {
         { status: 404 },
       );
     }
+    if (existing.imageUrl !== item.imageUrl) {
+      await safelyDeleteManagedMedia(existing.imageUrl);
+    }
     return Response.json({ item, kind });
   } catch (error) {
     return apiError(error);
@@ -92,9 +92,9 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const authorization = await authorizeAdmin(request);
+  const authorization = await authorizeAdminRequest(request);
   if (!authorization.allowed) return authorization.response;
-  const originError = validateWriteOrigin(request);
+  const originError = validateAdminWriteOrigin(request);
   if (originError) return originError;
 
   try {
@@ -108,6 +108,10 @@ export async function DELETE(request: Request) {
     }
     const kind = parseKind(kindValue);
     const id = parseId(idValue);
+    const content = await getAdminContent();
+    const existing = (kind === "book" ? content.books : content.courses).find(
+      (item) => item.id === id,
+    );
     const deleted = await deleteContent(kind, id);
     if (!deleted) {
       return Response.json(
@@ -115,49 +119,11 @@ export async function DELETE(request: Request) {
         { status: 404 },
       );
     }
+    if (existing?.imageUrl) await safelyDeleteManagedMedia(existing.imageUrl);
     return Response.json({ deleted: true, id, kind });
   } catch (error) {
     return apiError(error);
   }
-}
-
-async function authorizeAdmin(request: Request): Promise<AuthorizationResult> {
-  const session = await getAdminSessionFromCookieHeader(
-    request.headers.get("cookie"),
-    process.env,
-    undefined,
-    { allowInsecureDefaults: isLocalAdminHost(new URL(request.url).host) },
-  );
-  if (!session) {
-    return {
-      allowed: false,
-      response: Response.json(
-        {
-          error: "Debes iniciar sesión para administrar el contenido.",
-          signInUrl: "/admin/login",
-        },
-        { status: 401, headers: { "Cache-Control": "no-store" } },
-      ),
-    };
-  }
-
-  return { allowed: true };
-}
-
-function validateWriteOrigin(request: Request): Response | null {
-  const origin = request.headers.get("origin");
-  if (!origin) return null;
-
-  try {
-    if (new URL(origin).origin === new URL(request.url).origin) return null;
-  } catch {
-    // A malformed Origin is rejected below.
-  }
-
-  return Response.json(
-    { error: "El origen de la solicitud no es válido." },
-    { status: 403 },
-  );
 }
 
 async function readJsonObject(request: Request): Promise<JsonRecord> {
@@ -310,6 +276,14 @@ class RequestValidationError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "RequestValidationError";
+  }
+}
+
+async function safelyDeleteManagedMedia(url: string): Promise<void> {
+  try {
+    await deleteManagedMedia(url);
+  } catch (error) {
+    console.error("No se pudo retirar una portada sustituida", error);
   }
 }
 

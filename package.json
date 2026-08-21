@@ -10,7 +10,7 @@
     "build": "vinext build && node scripts/sanitize-cloudflare-build.mjs",
     "start": "vinext start",
     "test": "npm run build && npm run test:unit && node --test tests/browser-responsive.test.mjs && npm run test:admin-ui",
-    "test:unit": "npm run test:auth && npm run test:contact && node --test tests/rendered-html.test.mjs tests/content-contract.test.mjs",
+    "test:unit": "npm run test:auth && npm run test:contact && node --experimental-strip-types --test tests/media-upload.test.mjs && node --test tests/rendered-html.test.mjs tests/content-contract.test.mjs",
     "test:browser": "npm run build && node --test tests/browser-responsive.test.mjs",
     "test:auth": "node --experimental-strip-types --test tests/admin-auth.test.mjs",
     "test:contact": "node --experimental-strip-types --test tests/contact-form.test.mjs",

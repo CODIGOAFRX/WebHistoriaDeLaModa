@@ -10,6 +10,7 @@ const expectedSecrets = [
 
 const config = JSON.parse(await readFile(configUrl, "utf8"));
 const database = config.d1_databases?.find((entry) => entry.binding === "DB");
+const mediaBucket = config.r2_buckets?.find((entry) => entry.binding === "MEDIA");
 
 if (!database || !database.database_id || database.database_id === placeholderDatabaseId) {
   throw new Error(
@@ -20,6 +21,12 @@ if (!database || !database.database_id || database.database_id === placeholderDa
 
 if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(database.database_id)) {
   throw new Error("El database_id de D1 en wrangler.jsonc no tiene formato UUID.");
+}
+
+if (!mediaBucket || mediaBucket.bucket_name !== "historia-de-la-moda-media") {
+  throw new Error(
+    "Falta el binding R2 MEDIA para guardar las portadas de los libros.",
+  );
 }
 
 const customDomain = config.routes?.some(
@@ -42,4 +49,4 @@ for (const secret of expectedSecrets) {
   }
 }
 
-console.log("Configuración Cloudflare válida: dominio, D1 y secretos declarados.");
+console.log("Configuración Cloudflare válida: dominio, D1, R2 y secretos declarados.");

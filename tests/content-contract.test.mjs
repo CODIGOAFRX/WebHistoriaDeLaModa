@@ -123,7 +123,7 @@ test("keeps unpublished editorial projects out of the public site and seed data"
   assert.match(libraryGrid, /role="status"/);
 });
 
-test("exposes the verified 2026 conference and a real contact form", async () => {
+test("exposes the verified 2026 conference, uploads and a real contact form", async () => {
   const [conferences, contactPage, contactForm, contactRoute, rateLimit, wranglerConfig] = await Promise.all([
     source("app/conferencias/page.tsx"),
     source("app/contacto/page.tsx"),
@@ -149,6 +149,15 @@ test("exposes the verified 2026 conference and a real contact form", async () =>
   assert.match(contactRoute, /readBodyWithinLimit/);
   assert.match(contactForm, /submissionId/);
   assert.match(contactRoute, /Idempotency-Key.*contact-batch-/s);
+  const adminStudio = await source("app/admin/AdminStudio.tsx");
+  const mediaRoute = await source("app/api/admin/media/route.ts");
+  const wrangler = await source("wrangler.jsonc");
+  assert.match(adminStudio, /type="file"/);
+  assert.match(adminStudio, /image\/jpeg,image\/png,image\/webp,image\/avif/);
+  assert.match(adminStudio, /\/api\/admin\/media/);
+  assert.match(mediaRoute, /MAX_COVER_BYTES/);
+  assert.match(mediaRoute, /getMediaBucket/);
+  assert.match(wrangler, /"binding": "MEDIA"/);
   const adminContentRoute = await source("app/api/admin/content/route.ts");
   assert.match(adminContentRoute, /requireSecure/);
   assert.match(adminContentRoute, /debe usar HTTPS o comenzar por/);

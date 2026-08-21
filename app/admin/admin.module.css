@@ -397,6 +397,94 @@
   grid-column: 1 / -1;
 }
 
+.coverUpload {
+  display: grid;
+  gap: 0.48rem;
+}
+
+.coverUpload > label > span {
+  color: #47413f;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.coverUploadBody {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.coverPreview {
+  display: grid;
+  min-height: 158px;
+  place-items: center;
+  border: 1px solid var(--admin-line);
+  color: #6b4a47;
+  background-color: var(--admin-pink);
+  background-position: center;
+  background-size: cover;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.5rem;
+}
+
+.coverPreview span {
+  display: grid;
+  width: 3rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgba(107, 74, 71, 0.55);
+  border-radius: 50%;
+}
+
+.coverUploadControls {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.7rem;
+}
+
+.coverUploadControls input[type="file"] {
+  min-height: 3.25rem;
+  padding: 0.35rem;
+  cursor: pointer;
+}
+
+.coverUploadControls input[type="file"]::file-selector-button {
+  min-height: 2.45rem;
+  margin-right: 0.75rem;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  color: var(--admin-white);
+  background: var(--admin-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.coverUploadControls small {
+  color: var(--admin-muted);
+  font-size: 0.64rem;
+  line-height: 1.5;
+}
+
+.removeCoverButton {
+  align-self: flex-start;
+  min-height: 2.5rem;
+  padding: 0.55rem 0;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  color: #8a3f3a;
+  background: transparent;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .saveButton {
   grid-column: 1 / -1;
   width: 100%;
@@ -904,6 +992,14 @@
   .fullField,
   .saveButton {
     grid-column: 1;
+  }
+
+  .coverUploadBody {
+    grid-template-columns: 92px minmax(0, 1fr);
+  }
+
+  .coverPreview {
+    min-height: 138px;
   }
 
   .itemCard {

@@ -2,7 +2,8 @@
 
 Guía para publicar este proyecto como **Cloudflare Worker** y asociarlo a
 `historiadelamoda.net`. No se debe crear un proyecto de Cloudflare Pages: la web
-usa renderizado de servidor, rutas API, administración y una base de datos D1.
+usa renderizado de servidor, rutas API, administración, una base de datos D1 y
+almacenamiento R2 para las portadas.
 
 ## Estado preparado en el repositorio
 
@@ -291,6 +292,9 @@ Comprueba en una ventana privada:
 4. `/robots.txt` y `/sitemap.xml` responden y solo usan el dominio real.
 5. `/admin` no acepta `admin/admin`.
 6. Crear, publicar y eliminar una ficha de prueba confirma D1.
+   Al subir una portada desde el administrador, comprueba además que se muestra
+   en la Biblioteca: el archivo debe quedar guardado en el bucket R2
+   `historia-de-la-moda-media`.
 7. El formulario envía la consulta a `contacto@historiadelamoda.net`, que la
    reenvía a `demedinamoda@gmail.com`; al pulsar **Responder**, el destinatario
    es el correo introducido en el formulario. Esa persona recibe además un

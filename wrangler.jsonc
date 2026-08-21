@@ -22,6 +22,12 @@
       "migrations_dir": "drizzle"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "historia-de-la-moda-media"
+    }
+  ],
   "ratelimits": [
     {
       "name": "CONTACT_RATE_LIMITER",

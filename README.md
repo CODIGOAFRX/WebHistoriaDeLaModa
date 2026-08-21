@@ -24,7 +24,7 @@ npm run lint
 
 ## Publicación en Cloudflare
 
-El proyecto se publica como Cloudflare Worker con D1. La configuración está en
+El proyecto se publica como Cloudflare Worker con D1 y R2. La configuración está en
 `wrangler.jsonc` y la guía completa para crear la base, cargar secretos, asociar
 `historiadelamoda.net` y conectar GitHub está en
 [`docs/DESPLIEGUE_CLOUDFLARE.md`](docs/DESPLIEGUE_CLOUDFLARE.md).
@@ -44,6 +44,7 @@ usa `npm run check:cloudflare:artifact`.
 - La web pública vive en `app/`.
 - Los contenidos editoriales estáticos están en `app/data/content.ts`.
 - La biblioteca y los cursos usan Cloudflare D1.
+- Las portadas subidas desde el administrador se guardan en Cloudflare R2.
 - `/admin` permite gestionar libros y cursos mediante un acceso temporal con
   usuario y contraseña.
 - En desarrollo, las credenciales predeterminadas son `admin` / `admin`.

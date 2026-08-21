@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type {
   BookRecord,
   ContentKind,
@@ -41,6 +41,12 @@ type ApiCollectionResponse = {
   storageAvailable: boolean;
 };
 
+type ApiMediaResponse = {
+  url: string;
+  contentType: string;
+  size: number;
+};
+
 type Feedback = { tone: "success" | "error"; text: string } | null;
 
 const moneyFormatter = new Intl.NumberFormat("es-ES", {
@@ -65,6 +71,9 @@ export function AdminStudio({
   const [busy, setBusy] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [storageReady, setStorageReady] = useState(storageAvailable);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const items = activeKind === "book" ? books : courses;
   const publishedCount = useMemo(
@@ -72,12 +81,30 @@ export function AdminStudio({
     [items],
   );
 
+  useEffect(() => {
+    return () => {
+      if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+    };
+  }, [coverPreviewUrl]);
+
+  function selectCoverFile(file: File | null) {
+    setCoverFile(file);
+    setCoverPreviewUrl(file ? URL.createObjectURL(file) : "");
+  }
+
+  function clearCoverSelection() {
+    setCoverFile(null);
+    setCoverPreviewUrl("");
+    if (coverInputRef.current) coverInputRef.current.value = "";
+  }
+
   function selectKind(kind: ContentKind) {
     if (busy) return;
     const count = kind === "book" ? books.length : courses.length;
     setActiveKind(kind);
     setEditingId(null);
     setForm(emptyForm(kind, count));
+    clearCoverSelection();
     setFeedback(null);
   }
 
@@ -85,6 +112,7 @@ export function AdminStudio({
     if (busy) return;
     setEditingId(null);
     setForm(emptyForm(activeKind, items.length));
+    clearCoverSelection();
     setFeedback(null);
     focusEditor();
   }
@@ -103,6 +131,7 @@ export function AdminStudio({
       status: item.status,
       scormUrl: isCourseRecord(item) ? item.scormUrl : "",
     });
+    clearCoverSelection();
     setFeedback(null);
     focusEditor();
   }
@@ -125,12 +154,25 @@ export function AdminStudio({
     setBusy("save");
     setFeedback(null);
     try {
+      let imageUrl = form.imageUrl;
+      if (activeKind === "book" && coverFile) {
+        const upload = new FormData();
+        upload.append("file", coverFile);
+        const media = await requestJson<ApiMediaResponse>("/api/admin/media", {
+          method: "POST",
+          body: upload,
+        });
+        imageUrl = media.url;
+        setForm((current) => ({ ...current, imageUrl }));
+        clearCoverSelection();
+      }
+
       const payload = {
         kind: activeKind,
         ...(editingId ? { id: editingId } : {}),
         title: form.title,
         description: form.description,
-        imageUrl: form.imageUrl,
+        imageUrl,
         category: form.category,
         author: form.author,
         sortOrder,
@@ -148,6 +190,7 @@ export function AdminStudio({
       );
       upsertItem(response.kind, response.item);
       setEditingId(response.item.id);
+      setForm((current) => ({ ...current, imageUrl: response.item.imageUrl }));
       setFeedback({
         tone: "success",
         text: editingId ? "Cambios guardados." : "Contenido creado.",
@@ -222,6 +265,7 @@ export function AdminStudio({
       if (editingId === item.id) {
         setEditingId(null);
         setForm(emptyForm(activeKind, Math.max(0, items.length - 1)));
+        clearCoverSelection();
       }
       setFeedback({ tone: "success", text: "Contenido eliminado." });
     } catch (error) {
@@ -445,21 +489,83 @@ export function AdminStudio({
               />
             </label>
 
-            <label className={styles.fullField}>
-              <span>URL de imagen</span>
-              <input
-                name="imageUrl"
-                type="text"
-                inputMode="url"
-                value={form.imageUrl}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, imageUrl: event.target.value }))
-                }
-                maxLength={2048}
-                disabled={!storageReady}
-                placeholder="https://… o /images/…"
-              />
-            </label>
+            {activeKind === "book" ? (
+              <div className={`${styles.fullField} ${styles.coverUpload}`}>
+                <label htmlFor="admin-cover-file">
+                  <span>Portada del libro</span>
+                </label>
+                <div className={styles.coverUploadBody}>
+                  <div
+                    className={styles.coverPreview}
+                    style={
+                      coverPreviewUrl || form.imageUrl
+                        ? {
+                            backgroundImage: `url(${JSON.stringify(
+                              coverPreviewUrl || form.imageUrl,
+                            )})`,
+                          }
+                        : undefined
+                    }
+                    role={coverPreviewUrl || form.imageUrl ? "img" : undefined}
+                    aria-label={
+                      coverPreviewUrl || form.imageUrl
+                        ? "Vista previa de la portada"
+                        : undefined
+                    }
+                  >
+                    {!coverPreviewUrl && !form.imageUrl ? (
+                      <span aria-hidden="true">HM</span>
+                    ) : null}
+                  </div>
+                  <div className={styles.coverUploadControls}>
+                    <input
+                      ref={coverInputRef}
+                      id="admin-cover-file"
+                      name="coverFile"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      onChange={(event) =>
+                        selectCoverFile(event.target.files?.[0] ?? null)
+                      }
+                      disabled={!storageReady || busy !== null}
+                    />
+                    <small>
+                      Elige una imagen del ordenador o de la galería. En el móvil
+                      también puedes hacer una foto. JPG, PNG, WebP o AVIF; máximo 8 MB.
+                    </small>
+                    {coverPreviewUrl || form.imageUrl ? (
+                      <button
+                        type="button"
+                        className={styles.removeCoverButton}
+                        onClick={() => {
+                          clearCoverSelection();
+                          setForm((current) => ({ ...current, imageUrl: "" }));
+                        }}
+                        disabled={!storageReady || busy !== null}
+                      >
+                        Quitar portada
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <label className={styles.fullField}>
+                <span>URL de imagen del curso</span>
+                <input
+                  name="imageUrl"
+                  type="text"
+                  inputMode="url"
+                  value={form.imageUrl}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, imageUrl: event.target.value }))
+                  }
+                  maxLength={2048}
+                  disabled={!storageReady}
+                  placeholder="https://… o /images/…"
+                />
+              </label>
+            )}
 
             {activeKind === "course" ? (
               <label className={styles.fullField}>

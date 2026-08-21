@@ -200,6 +200,16 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
       `new book did not focus editor; errors: ${runtimeErrors.join(" | ")}`,
     );
     await fillCommonFields(bookTitle, "Descripción inicial para probar la ficha de biblioteca.");
+    const coverPng = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "base64",
+    );
+    await page.locator('#admin-editor input[name="coverFile"]').setInputFiles({
+      name: "portada-qa.png",
+      mimeType: "image/png",
+      buffer: coverPng,
+    });
+    await page.getByRole("img", { name: "Vista previa de la portada" }).waitFor();
     const createBookButton = page.getByRole("button", { name: "Crear libro" });
     const formState = await page.locator("form").filter({ has: createBookButton }).evaluate((form) => ({
       valid: form.checkValidity(),
@@ -216,8 +226,17 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
       /Contenido creado/,
       `book create feedback: ${await feedbackText()}; requests: ${requests.join(", ")}; errors: ${runtimeErrors.join(" | ")}; url: ${page.url()}`,
     );
+    assert.equal(
+      requests.some((request) => request.includes("POST") && request.includes("/api/admin/media")),
+      true,
+      `the book cover was not uploaded: ${requests.join(", ")}`,
+    );
 
     let bookCard = page.locator("article").filter({ hasText: bookTitle });
+    assert.match(
+      (await bookCard.getByRole("img", { name: `Imagen de ${bookTitle}` }).getAttribute("style")) || "",
+      /\/media\/book-covers\//,
+    );
     await bookCard.getByRole("button", { name: `Editar ${bookTitle}` }).click();
     await page.waitForFunction(
       () => document.activeElement?.id === "admin-content-title",
@@ -271,6 +290,17 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
 
     await page.goto(`${baseUrl}/biblioteca`, { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: bookTitle }).waitFor();
+    const publicCover = page.getByRole("img", { name: `Cubierta de ${bookTitle}` });
+    assert.match((await publicCover.getAttribute("src")) || "", /^\/media\/book-covers\//);
+    await publicCover.evaluate(async (image) => {
+      if (!image.complete) {
+        await new Promise((resolve, reject) => {
+          image.addEventListener("load", resolve, { once: true });
+          image.addEventListener("error", reject, { once: true });
+        });
+      }
+      if (image.naturalWidth < 1) throw new Error("the uploaded cover did not render");
+    });
     assert.equal(await page.getByRole("group", { name: "Filtrar por categoría" }).count(), 1);
     assert.equal(
       await page.getByRole("button", { name: "Todos" }).getAttribute("aria-pressed"),

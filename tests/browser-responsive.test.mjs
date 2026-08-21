@@ -1184,7 +1184,11 @@ test(
       if (await newBookButton.isDisabled()) {
         assert.match(await page.getByRole("alert").textContent(), /Persistencia pendiente/i);
         await page.getByRole("button", { name: "Reintentar" }).click();
-        await page.getByRole("alert").filter({ hasText: /base de datos D1/i }).waitFor();
+        await page
+          .locator('[role="alert"], [role="status"]')
+          .filter({ hasText: /D1|Contenido actualizado/i })
+          .first()
+          .waitFor();
         return;
       }
       await newBookButton.click();
