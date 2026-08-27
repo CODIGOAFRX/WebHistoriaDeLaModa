@@ -363,6 +363,21 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
       { open: true, modal: true, scrollLocked: true },
     );
     assert.equal(await bookDialog.locator("#book-dialog-title").textContent(), bookTitle);
+    // El reset de Tailwind borra el `margin: auto` del diálogo modal y lo deja
+    // pegado a la esquina superior izquierda.
+    assert.deepEqual(
+      await bookDialog.evaluate((element) => {
+        const box = element.getBoundingClientRect();
+        return {
+          centradoHorizontal:
+            Math.abs(box.left - (window.innerWidth - box.right)) <= 1,
+          centradoVertical:
+            Math.abs(box.top - (window.innerHeight - box.bottom)) <= 1,
+        };
+      }),
+      { centradoHorizontal: true, centradoVertical: true },
+      "la ficha queda centrada en la pantalla",
+    );
     assert.match(
       await bookDialog.locator(".book-dialog-text").textContent(),
       /Descripción editada y verificada/,

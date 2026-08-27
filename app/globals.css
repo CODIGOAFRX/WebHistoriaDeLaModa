@@ -2339,6 +2339,9 @@ body.book-dialog-open {
   max-width: none;
   max-height: min(86vh, 840px);
   flex-direction: column;
+  /* El reset de Tailwind aplica `margin: 0` a `*` y anula el `margin: auto`
+     con el que el navegador centra un diálogo modal. */
+  margin: auto;
   padding: 0;
   border: 1px solid rgba(255, 253, 249, 0.2);
   overflow: hidden;
