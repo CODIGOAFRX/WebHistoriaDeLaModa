@@ -2225,11 +2225,84 @@ main {
   font-size: 10px;
 }
 
-.book-card-copy > p:last-child {
+.book-card-blurb {
+  display: -webkit-box;
+  overflow: hidden;
   margin: 16px 0 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   color: rgba(255,253,249,.62);
   font-size: 11px;
   line-height: 1.65;
+}
+
+.book-card-public {
+  position: relative;
+}
+
+.book-card-trigger {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 9px;
+  padding: 0;
+  border: 0;
+  margin-top: 10px;
+  background: transparent;
+  color: var(--paper-bright);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.book-card-trigger::after {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  content: "";
+}
+
+.book-card-trigger > span:first-child {
+  position: relative;
+  padding-bottom: 3px;
+  background-image: linear-gradient(var(--rose), var(--rose));
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0 1px;
+  transition: background-size 260ms ease, color 200ms ease;
+}
+
+.book-card-trigger-mark {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1px solid var(--rule-light);
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
+  transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
+}
+
+.book-card-public:hover .book-card-trigger > span:first-child,
+.book-card-trigger:focus-visible > span:first-child {
+  background-size: 100% 1px;
+  color: var(--rose);
+}
+
+.book-card-public:hover .book-card-trigger-mark,
+.book-card-trigger:focus-visible .book-card-trigger-mark {
+  border-color: var(--rose);
+  background: var(--rose);
+  color: var(--ink);
+}
+
+.book-card-trigger:focus-visible {
+  outline: 2px solid var(--rose-deep);
+  outline-offset: 6px;
 }
 
 .library-section .empty-state {
@@ -2254,6 +2327,213 @@ main {
   font-style: italic;
   letter-spacing: -.035em;
   line-height: .95;
+}
+
+/* Ficha de libro */
+body.book-dialog-open {
+  overflow: hidden;
+}
+
+.book-dialog {
+  width: min(1080px, calc(100vw - 56px));
+  max-width: none;
+  max-height: min(86vh, 840px);
+  flex-direction: column;
+  padding: 0;
+  border: 1px solid rgba(255, 253, 249, 0.2);
+  overflow: hidden;
+  background: var(--ink);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.5);
+  color: var(--paper-bright);
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+  transition-property: opacity, transform, overlay, display;
+  transition-duration: 420ms;
+  transition-timing-function: cubic-bezier(.22, 1, .36, 1);
+  transition-behavior: allow-discrete;
+}
+
+.book-dialog[open] {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@starting-style {
+  .book-dialog[open] {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+}
+
+.book-dialog::backdrop {
+  background: rgba(12, 10, 9, 0.72);
+  opacity: 0;
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  transition-property: opacity, overlay, display;
+  transition-duration: 380ms;
+  transition-timing-function: ease;
+  transition-behavior: allow-discrete;
+}
+
+.book-dialog[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .book-dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+.book-dialog-panel {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.book-dialog-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px clamp(18px, 3vw, 34px);
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.book-dialog-bar .eyebrow {
+  color: rgba(255, 253, 249, 0.5);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+}
+
+.book-dialog-close {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--paper-bright);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.book-dialog-close-mark {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--rule-light);
+  border-radius: 50%;
+  font-size: 17px;
+  line-height: 1;
+  transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
+}
+
+.book-dialog-close:hover .book-dialog-close-mark,
+.book-dialog-close:focus-visible .book-dialog-close-mark {
+  border-color: var(--rose);
+  background: var(--rose);
+  color: var(--ink);
+}
+
+.book-dialog-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(255, 253, 249, 0.3) transparent;
+  scrollbar-width: thin;
+}
+
+.book-dialog-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(24px, 3.4vw, 48px);
+  padding: clamp(24px, 3.4vw, 44px);
+}
+
+.book-dialog-cover {
+  position: sticky;
+  top: 0;
+  align-self: start;
+}
+
+.book-dialog-cover-frame {
+  position: relative;
+  display: grid;
+  /* La portada nunca debe superar el alto visible: si no, al quedarse fija
+     su parte inferior sería inalcanzable. */
+  width: min(100%, calc((min(86vh, 840px) - 168px) / 1.5));
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  margin-inline: auto;
+  place-items: center;
+  background: #2a2523;
+  box-shadow: 10px 12px 0 rgba(255, 255, 255, 0.07);
+}
+
+.book-dialog-cover-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-dialog-cover-frame > span {
+  color: rgba(255, 253, 249, 0.45);
+  font-family: var(--display);
+  font-size: 46px;
+}
+
+.book-dialog-category {
+  margin: 0 0 13px;
+  color: var(--rose);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.book-dialog-copy h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(34px, 4.2vw, 56px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+}
+
+.book-dialog-author {
+  margin: 15px 0 0;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--rule-light);
+  color: rgba(255, 253, 249, 0.6);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.book-dialog-text {
+  margin-top: 24px;
+}
+
+.book-dialog-text p {
+  margin: 0 0 16px;
+  color: rgba(255, 253, 249, 0.78);
+  font-size: 14px;
+  line-height: 1.78;
+}
+
+.book-dialog-text p:last-child {
+  margin-bottom: 0;
 }
 
 /* School */
@@ -3455,8 +3735,36 @@ main {
     font-size: 25px;
   }
 
-  .book-card-copy > p:last-child {
-    display: none;
+  .book-card-blurb {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .book-dialog {
+    width: 100%;
+    max-width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: 0;
+    margin: 0;
+  }
+
+  .book-dialog-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+    padding: 24px 20px 44px;
+  }
+
+  .book-dialog-cover {
+    position: static;
+  }
+
+  .book-dialog-cover-frame {
+    width: min(60%, 230px);
+  }
+
+  .book-dialog-copy h2 {
+    font-size: clamp(32px, 9vw, 46px);
   }
 
   .school-origin-image {

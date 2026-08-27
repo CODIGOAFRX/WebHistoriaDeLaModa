@@ -39,6 +39,12 @@ const eslintConfig = defineConfig([
       // Vinext beta's next/link client runtime currently throws during navigation.
       // Native anchors keep every internal route usable until that runtime is fixed.
       "@next/next/no-html-link-for-pages": "off",
+      // Una región desplazable necesita ser enfocable para poder recorrerse con
+      // el teclado (axe: scrollable-region-focusable).
+      "jsx-a11y/no-noninteractive-tabindex": [
+        "error",
+        { tags: [], roles: ["tabpanel", "region"], allowExpressionValues: true },
+      ],
     },
   },
 ]);

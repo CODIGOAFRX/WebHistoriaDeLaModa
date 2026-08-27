@@ -326,6 +326,88 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
     await librarySearch.pressSequentially("Libro QA");
     await page.getByRole("heading", { name: bookTitle }).waitFor();
 
+    const publicCard = page.locator(".book-card-public").filter({ hasText: bookTitle });
+    assert.equal(
+      await publicCard
+        .locator(".book-card-blurb")
+        .evaluate((element) => getComputedStyle(element).webkitLineClamp),
+      "3",
+      "la reseña se recorta en la tarjeta para nivelar la rejilla",
+    );
+
+    // Toda la tarjeta abre la ficha: el clic central cae sobre el disparador.
+    // Tras una recarga el clic puede adelantarse a la hidratación, así que se
+    // reintenta igual que en la búsqueda de más arriba.
+    const bookDialog = page.locator("dialog.book-dialog");
+    const openBookDialog = async (card) => {
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        await card.click();
+        if (await bookDialog.count()) break;
+        await page.waitForTimeout(250);
+      }
+      await bookDialog.waitFor();
+      // La animación de entrada aplica un `transform`, que falsearía cualquier
+      // medida tomada antes de que termine.
+      await bookDialog.evaluate((element) =>
+        Promise.all(element.getAnimations().map((animation) => animation.finished.catch(() => {}))),
+      );
+    };
+
+    await openBookDialog(publicCard);
+    assert.deepEqual(
+      await bookDialog.evaluate((element) => ({
+        open: element.open,
+        modal: element.matches(":modal"),
+        scrollLocked: document.body.classList.contains("book-dialog-open"),
+      })),
+      { open: true, modal: true, scrollLocked: true },
+    );
+    assert.equal(await bookDialog.locator("#book-dialog-title").textContent(), bookTitle);
+    assert.match(
+      await bookDialog.locator(".book-dialog-text").textContent(),
+      /Descripción editada y verificada/,
+      "la ficha muestra la reseña completa",
+    );
+
+    await bookDialog.getByRole("button", { name: "Cerrar" }).click();
+    await bookDialog.waitFor({ state: "detached" });
+    assert.equal(
+      await page.evaluate(() => document.body.classList.contains("book-dialog-open")),
+      false,
+      "al cerrar la ficha se devuelve el scroll a la página",
+    );
+
+    await openBookDialog(publicCard);
+    await page.keyboard.press("Escape");
+    await bookDialog.waitFor({ state: "detached" });
+
+    // El fallo original: en móvil la reseña de la tarjeta quedaba oculta.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    const mobileCard = page.locator(".book-card-public").filter({ hasText: bookTitle });
+    await mobileCard.waitFor();
+    assert.equal(
+      await mobileCard.locator(".book-card-blurb").isVisible(),
+      true,
+      "la reseña sigue visible en móvil",
+    );
+    await openBookDialog(mobileCard);
+    assert.deepEqual(
+      await bookDialog.evaluate((element) => {
+        const scroller = element.querySelector(".book-dialog-scroll");
+        return {
+          fillsWidth: element.offsetWidth === window.innerWidth,
+          fillsHeight: element.offsetHeight === window.innerHeight,
+          noHorizontalOverflow: scroller.scrollWidth <= scroller.clientWidth + 1,
+        };
+      }),
+      { fillsWidth: true, fillsHeight: true, noHorizontalOverflow: true },
+      "en móvil la ficha ocupa toda la pantalla",
+    );
+    await page.keyboard.press("Escape");
+    await bookDialog.waitFor({ state: "detached" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+
     await page.goto(`${baseUrl}/admin`, { waitUntil: "domcontentloaded" });
     await selectAdminTab(/Cursos/);
     await page.getByRole("button", { name: /Nuevo curso/ }).click();

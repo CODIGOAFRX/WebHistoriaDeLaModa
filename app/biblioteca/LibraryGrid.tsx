@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { BookDialog } from "./BookDialog";
 
 export type LibraryBook = {
   id: number;
@@ -15,6 +16,8 @@ export type LibraryBook = {
 export function LibraryGrid({ books }: { books: LibraryBook[] }) {
   const [category, setCategory] = useState("Todos");
   const [query, setQuery] = useState("");
+  const [openBook, setOpenBook] = useState<LibraryBook | null>(null);
+  const closeBook = useCallback(() => setOpenBook(null), []);
   const categories = useMemo(
     () => ["Todos", ...Array.from(new Set(books.map((book) => book.category))).filter(Boolean)],
     [books],
@@ -90,7 +93,18 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
                 <p>{book.category}</p>
                 <h2>{book.title}</h2>
                 <span>{book.author}</span>
-                <p>{book.description}</p>
+                <p className="book-card-blurb">{book.description}</p>
+                <button
+                  type="button"
+                  className="book-card-trigger"
+                  aria-label={`Ver la ficha de ${book.title}`}
+                  onClick={() => setOpenBook(book)}
+                >
+                  <span>Ver ficha</span>
+                  <span className="book-card-trigger-mark" aria-hidden="true">
+                    +
+                  </span>
+                </button>
               </div>
             </article>
           ))}
@@ -101,6 +115,8 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
           <p>Prueba con otra palabra o vuelve a ver todas las categorías.</p>
         </div>
       )}
+
+      <BookDialog book={openBook} onClose={closeBook} />
     </div>
   );
 }
