@@ -8,7 +8,7 @@ export type LibraryBook = {
   title: string;
   author: string;
   description: string;
-  category: string;
+  categories: string[];
   coverUrl: string;
   featured?: boolean;
 };
@@ -18,17 +18,29 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
   const [query, setQuery] = useState("");
   const [openBook, setOpenBook] = useState<LibraryBook | null>(null);
   const closeBook = useCallback(() => setOpenBook(null), []);
-  const categories = useMemo(
-    () => ["Todos", ...Array.from(new Set(books.map((book) => book.category))).filter(Boolean)],
-    [books],
-  );
+  // Un libro puede pertenecer a varias categorías: el filtro reúne todas las
+  // que aparecen, en el orden en que las presenta la biblioteca.
+  const categories = useMemo(() => {
+    const names: string[] = [];
+    const seen = new Set<string>();
+    for (const book of books) {
+      for (const name of book.categories) {
+        const key = name.trim().toLocaleLowerCase("es");
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        names.push(name);
+      }
+    }
+    return ["Todos", ...names];
+  }, [books]);
   const visible = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase("es");
     return books.filter((book) => {
-      const matchesCategory = category === "Todos" || book.category === category;
+      const matchesCategory =
+        category === "Todos" || book.categories.includes(category);
       const matchesQuery =
         !normalized ||
-        `${book.title} ${book.author} ${book.description}`
+        `${book.title} ${book.author} ${book.description} ${book.categories.join(" ")}`
           .toLocaleLowerCase("es")
           .includes(normalized);
       return matchesCategory && matchesQuery;
@@ -82,7 +94,7 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
                   <img src={book.coverUrl} alt={`Cubierta de ${book.title}`} loading="lazy" />
                 ) : (
                   <>
-                    <span>{book.category}</span>
+                    <span>{book.categories[0] ?? "Biblioteca"}</span>
                     <span className="book-card-cover-title">{book.title}</span>
                     <p>{book.author}</p>
                     <i aria-hidden="true">HM</i>
@@ -90,7 +102,7 @@ export function LibraryGrid({ books }: { books: LibraryBook[] }) {
                 )}
               </div>
               <div className="book-card-copy">
-                <p>{book.category}</p>
+                <p>{book.categories.join(" · ")}</p>
                 <h2>{book.title}</h2>
                 <span>{book.author}</span>
                 <p className="book-card-blurb">{book.description}</p>

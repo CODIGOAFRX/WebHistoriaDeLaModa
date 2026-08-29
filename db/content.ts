@@ -2,13 +2,26 @@ import type { ContentStatus } from "./schema";
 
 export type ContentKind = "book" | "course";
 
+export type CategoryRecord = {
+  id: number;
+  kind: ContentKind;
+  name: string;
+  slug: string;
+};
+
+/** Tope de categorías por ficha: suficiente para cruzar temas sin ensuciar la tarjeta. */
+export const MAX_CATEGORIES_PER_ITEM = 8;
+export const MAX_CATEGORY_LENGTH = 80;
+
 export type BookRecord = {
   id: number;
   title: string;
   slug: string;
   description: string;
   imageUrl: string;
+  /** Categoría principal: la primera de `categories`, conservada por compatibilidad. */
   category: string;
+  categories: string[];
   author: string;
   sortOrder: number;
   priceCents: number;
@@ -28,7 +41,7 @@ export type ContentInput = {
   title: string;
   description: string;
   imageUrl: string;
-  category: string;
+  categories: string[];
   author: string;
   sortOrder: number;
   priceCents: number;
@@ -59,6 +72,7 @@ type BookRow = {
   description: string;
   image_url: string;
   category: string;
+  categories?: string | null;
   author: string;
   sort_order: number;
   price_cents: number;
@@ -118,6 +132,20 @@ const INITIAL_STATEMENTS: readonly InitialStatement[] = [
       value TEXT NOT NULL,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL
     )`,
+  },
+  {
+    query: `CREATE TABLE IF NOT EXISTS content_categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      kind TEXT NOT NULL,
+      name TEXT NOT NULL,
+      slug TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
+      CONSTRAINT content_categories_kind_valid CHECK (kind in ('book', 'course'))
+    )`,
+  },
+  {
+    query:
+      "CREATE UNIQUE INDEX IF NOT EXISTS content_categories_kind_slug_unique ON content_categories (kind, slug)",
   },
   { query: "CREATE UNIQUE INDEX IF NOT EXISTS books_slug_unique ON books (slug)" },
   {
@@ -230,6 +258,67 @@ async function initializeContentDatabase(): Promise<void> {
       : prepared;
     await executable.run();
   }
+
+  await ensureCategoriesColumn(binding, "books");
+  await ensureCategoriesColumn(binding, "courses");
+  await seedCategoryCatalog(binding);
+}
+
+/**
+ * `ALTER TABLE ... ADD COLUMN` no admite `IF NOT EXISTS` en SQLite, así que la
+ * columna se añade solo cuando falta en bases creadas antes de las categorías
+ * múltiples.
+ */
+async function ensureCategoriesColumn(
+  binding: ContentD1Database,
+  table: "books" | "courses",
+): Promise<void> {
+  const columns = await binding
+    .prepare(`PRAGMA table_info(${table})`)
+    .all<{ name: string }>();
+  const present = (columns.results ?? []).some(
+    (column) => column.name === "categories",
+  );
+  if (present) return;
+
+  await binding
+    .prepare(
+      `ALTER TABLE ${table} ADD COLUMN categories TEXT DEFAULT '' NOT NULL`,
+    )
+    .run();
+  await binding
+    .prepare(
+      `UPDATE ${table} SET categories = json_array(category) WHERE categories = ''`,
+    )
+    .run();
+}
+
+/** Carga el catálogo con las categorías que ya usaban las fichas existentes. */
+async function seedCategoryCatalog(
+  binding: ContentD1Database,
+): Promise<void> {
+  const seeded = await binding
+    .prepare("SELECT value FROM content_setup WHERE key = 'categories_seed'")
+    .first<{ value: string }>();
+  if (seeded) return;
+
+  for (const [kind, table] of [
+    ["book", "books"],
+    ["course", "courses"],
+  ] as const) {
+    const rows = await binding
+      .prepare(`SELECT DISTINCT category FROM ${table}`)
+      .all<{ category: string }>();
+    const names = (rows.results ?? []).map((row) => row.category);
+    await registerCategories(binding, kind, names);
+  }
+
+  await binding
+    .prepare(
+      `INSERT INTO content_setup (key, value) VALUES ('categories_seed', '1')
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+    )
+    .run();
 }
 
 export async function getPublicBooks(): Promise<BookRecord[]> {
@@ -301,18 +390,21 @@ export async function createContent(
   const binding = await getContentBinding();
   const table = tableFor(kind);
   const slug = await uniqueSlug(binding, table, input.title);
+  const categories = normalizeCategories(input.categories);
+  await registerCategories(binding, kind, categories);
 
   if (kind === "course") {
     const result = await binding
       .prepare(`INSERT INTO courses
-        (title, slug, description, image_url, category, author, sort_order, price_cents, status, scorm_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        (title, slug, description, image_url, category, categories, author, sort_order, price_cents, status, scorm_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .bind(
         input.title,
         slug,
         input.description,
         input.imageUrl,
-        input.category,
+        primaryCategory(categories),
+        serializeCategories(categories),
         input.author,
         input.sortOrder,
         input.priceCents,
@@ -326,14 +418,15 @@ export async function createContent(
 
   const result = await binding
     .prepare(`INSERT INTO books
-      (title, slug, description, image_url, category, author, sort_order, price_cents, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      (title, slug, description, image_url, category, categories, author, sort_order, price_cents, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .bind(
       input.title,
       slug,
       input.description,
       input.imageUrl,
-      input.category,
+      primaryCategory(categories),
+      serializeCategories(categories),
       input.author,
       input.sortOrder,
       input.priceCents,
@@ -369,19 +462,22 @@ export async function updateContent(
   if (!exists) return null;
 
   const slug = await uniqueSlug(binding, table, input.title, id);
+  const categories = normalizeCategories(input.categories);
+  await registerCategories(binding, kind, categories);
   if (kind === "course") {
     await binding
       .prepare(`UPDATE courses SET
         title = ?, slug = ?, description = ?, image_url = ?, category = ?,
-        author = ?, sort_order = ?, price_cents = ?, status = ?, scorm_url = ?,
-        updated_at = CURRENT_TIMESTAMP
+        categories = ?, author = ?, sort_order = ?, price_cents = ?, status = ?,
+        scorm_url = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?`)
       .bind(
         input.title,
         slug,
         input.description,
         input.imageUrl,
-        input.category,
+        primaryCategory(categories),
+        serializeCategories(categories),
         input.author,
         input.sortOrder,
         input.priceCents,
@@ -396,7 +492,7 @@ export async function updateContent(
   await binding
     .prepare(`UPDATE books SET
       title = ?, slug = ?, description = ?, image_url = ?, category = ?,
-      author = ?, sort_order = ?, price_cents = ?, status = ?,
+      categories = ?, author = ?, sort_order = ?, price_cents = ?, status = ?,
       updated_at = CURRENT_TIMESTAMP
       WHERE id = ?`)
     .bind(
@@ -404,7 +500,8 @@ export async function updateContent(
       slug,
       input.description,
       input.imageUrl,
-      input.category,
+      primaryCategory(categories),
+      serializeCategories(categories),
       input.author,
       input.sortOrder,
       input.priceCents,
@@ -452,6 +549,132 @@ export function isLocalhostHost(host: string | null | undefined): boolean {
   } catch {
     return false;
   }
+}
+
+export async function getCategoryCatalog(): Promise<CategoryRecord[]> {
+  await ensureContentDatabase();
+  const binding = await getContentBinding();
+  const response = await binding
+    .prepare(
+      "SELECT id, kind, name, slug FROM content_categories ORDER BY name COLLATE NOCASE ASC",
+    )
+    .all<{ id: number; kind: ContentKind; name: string; slug: string }>();
+  return (response.results ?? []).map((row) => ({
+    id: Number(row.id),
+    kind: row.kind,
+    name: row.name,
+    slug: row.slug,
+  }));
+}
+
+export async function getPublicCategoryCatalog(): Promise<CategoryRecord[]> {
+  try {
+    return await getCategoryCatalog();
+  } catch {
+    return [];
+  }
+}
+
+export async function createCategory(
+  kind: ContentKind,
+  name: string,
+): Promise<CategoryRecord> {
+  await ensureContentDatabase();
+  const binding = await getContentBinding();
+  const [normalized] = normalizeCategories([name]);
+  if (!normalized) {
+    throw new Error("La categoría necesita un nombre.");
+  }
+
+  await registerCategories(binding, kind, [normalized]);
+  const row = await binding
+    .prepare(
+      "SELECT id, kind, name, slug FROM content_categories WHERE kind = ? AND slug = ?",
+    )
+    .bind(kind, categorySlug(normalized))
+    .first<{ id: number; kind: ContentKind; name: string; slug: string }>();
+  if (!row) throw new Error("No se pudo guardar la categoría.");
+  return { id: Number(row.id), kind: row.kind, name: row.name, slug: row.slug };
+}
+
+export async function deleteCategory(
+  kind: ContentKind,
+  id: number,
+): Promise<boolean> {
+  await ensureContentDatabase();
+  const binding = await getContentBinding();
+  const result = await binding
+    .prepare("DELETE FROM content_categories WHERE kind = ? AND id = ?")
+    .bind(kind, id)
+    .run();
+  return (result.meta?.changes ?? 0) > 0;
+}
+
+/** Añade al catálogo las categorías nuevas usadas por una ficha. */
+async function registerCategories(
+  binding: ContentD1Database,
+  kind: ContentKind,
+  names: readonly string[],
+): Promise<void> {
+  for (const name of normalizeCategories(names)) {
+    await binding
+      .prepare(
+        `INSERT INTO content_categories (kind, name, slug) VALUES (?, ?, ?)
+          ON CONFLICT(kind, slug) DO NOTHING`,
+      )
+      .bind(kind, name, categorySlug(name))
+      .run();
+  }
+}
+
+/** Limpia, recorta y deduplica una lista de categorías conservando su orden. */
+export function normalizeCategories(values: readonly unknown[]): string[] {
+  const seen = new Set<string>();
+  const normalized: string[] = [];
+
+  for (const value of values) {
+    if (typeof value !== "string") continue;
+    const name = value.replace(/\s+/g, " ").trim().slice(0, MAX_CATEGORY_LENGTH);
+    if (!name) continue;
+    const key = categorySlug(name);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    normalized.push(name);
+    if (normalized.length >= MAX_CATEGORIES_PER_ITEM) break;
+  }
+
+  return normalized;
+}
+
+export function parseCategoriesColumn(
+  raw: string | null | undefined,
+  fallback: string,
+): string[] {
+  const value = (raw ?? "").trim();
+  if (value.startsWith("[")) {
+    try {
+      const parsed: unknown = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        const categories = normalizeCategories(parsed);
+        if (categories.length) return categories;
+      }
+    } catch {
+      // Una columna corrupta cae al valor histórico de `category`.
+    }
+  }
+  return normalizeCategories([value || fallback]);
+}
+
+function serializeCategories(categories: readonly string[]): string {
+  return JSON.stringify(categories);
+}
+
+function primaryCategory(categories: readonly string[]): string {
+  return categories[0] ?? "";
+}
+
+function categorySlug(name: string): string {
+  return slugify(name);
 }
 
 function tableFor(kind: ContentKind): "books" | "courses" {
@@ -538,6 +761,7 @@ function mapBookRow(row: BookRow): BookRecord {
     description: row.description,
     imageUrl: row.image_url,
     category: row.category,
+    categories: parseCategoriesColumn(row.categories, row.category),
     author: row.author,
     sortOrder: Number(row.sort_order),
     priceCents: Number(row.price_cents),

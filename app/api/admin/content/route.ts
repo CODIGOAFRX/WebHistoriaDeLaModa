@@ -8,6 +8,9 @@ import {
   createContent,
   deleteContent,
   getAdminContent,
+  MAX_CATEGORIES_PER_ITEM,
+  MAX_CATEGORY_LENGTH,
+  normalizeCategories,
   updateContent,
   type ContentInput,
   type ContentKind,
@@ -160,7 +163,7 @@ function parseContentInput(
   const title = stringField(payload.title, "El título", 160, true);
   const description = stringField(payload.description, "La descripción", 3000);
   const imageUrl = urlField(payload.imageUrl, "La URL de imagen", true);
-  const category = stringField(payload.category, "La categoría", 80, true);
+  const categories = categoriesField(payload.categories, payload.category);
   const author = stringField(payload.author, "El autor", 120, true);
   const sortOrder = integerField(payload.sortOrder, "El orden", -10_000, 10_000);
   const priceCents = integerField(
@@ -180,7 +183,7 @@ function parseContentInput(
     title,
     description,
     imageUrl,
-    category,
+    categories,
     author,
     sortOrder,
     priceCents,
@@ -190,6 +193,40 @@ function parseContentInput(
         ? urlField(payload.scormUrl, "La URL de lanzamiento SCORM", true, true)
         : undefined,
   };
+}
+
+/**
+ * Acepta la lista nueva y, para llamadas antiguas, la categoría suelta que
+ * enviaban las versiones previas del estudio.
+ */
+function categoriesField(value: unknown, legacy: unknown): string[] {
+  const raw = Array.isArray(value)
+    ? value
+    : typeof legacy === "string"
+      ? [legacy]
+      : null;
+  if (!raw) {
+    throw new RequestValidationError("Las categorías deben ser una lista.");
+  }
+  if (raw.some((entry) => typeof entry !== "string")) {
+    throw new RequestValidationError("Cada categoría debe ser texto.");
+  }
+  if (raw.some((entry) => (entry as string).trim().length > MAX_CATEGORY_LENGTH)) {
+    throw new RequestValidationError(
+      `Cada categoría no puede superar ${MAX_CATEGORY_LENGTH} caracteres.`,
+    );
+  }
+  if (raw.length > MAX_CATEGORIES_PER_ITEM) {
+    throw new RequestValidationError(
+      `Puedes asignar como máximo ${MAX_CATEGORIES_PER_ITEM} categorías.`,
+    );
+  }
+
+  const categories = normalizeCategories(raw);
+  if (!categories.length) {
+    throw new RequestValidationError("Añade al menos una categoría.");
+  }
+  return categories;
 }
 
 function stringField(

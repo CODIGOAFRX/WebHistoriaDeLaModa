@@ -47,6 +47,12 @@ usa `npm run check:cloudflare:artifact`.
 - Las portadas subidas desde el administrador se guardan en Cloudflare R2.
 - `/admin` permite gestionar libros y cursos mediante un acceso temporal con
   usuario y contraseña.
+- Cada libro o curso admite varias categorías: se marcan en el editor desde el
+  catálogo guardado y se crean nuevas sin salir de la ficha. La primera marcada
+  encabeza la tarjeta y se conserva en la columna `category` de D1.
+- El catálogo de categorías vive en la tabla `content_categories`. La columna
+  `categories` y esa tabla se crean solas en el arranque, así que una base
+  anterior no necesita migración manual.
 - En desarrollo, las credenciales predeterminadas son `admin` / `admin`.
 - `ADMIN_USERNAME`, `ADMIN_PASSWORD` y `ADMIN_SESSION_SECRET` permiten
   sustituirlas sin tocar el código.

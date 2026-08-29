@@ -102,6 +102,7 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
   const suffix = `${Date.now()}`;
   const bookTitle = `Libro QA ${suffix}`;
   const courseTitle = `Curso QA ${suffix}`;
+  const extraCategory = `Modelos QA ${suffix}`;
 
   const cleanupContent = async () => {
     if (!page || page.isClosed()) return;
@@ -119,7 +120,16 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
             await fetch(`/api/admin/content?kind=${kind}&id=${item.id}`, { method: "DELETE" });
           }
         }
-      }, [bookTitle, courseTitle]);
+
+        const catalog = await fetch("/api/admin/categories", { cache: "no-store" });
+        if (!catalog.ok) return;
+        const { categories } = await catalog.json();
+        for (const category of categories.filter((entry) => titles.includes(entry.name))) {
+          await fetch(`/api/admin/categories?kind=${category.kind}&id=${category.id}`, {
+            method: "DELETE",
+          });
+        }
+      }, [bookTitle, courseTitle, extraCategory]);
     } catch {
       // Keep the original assertion failure if cleanup itself cannot finish.
     }
@@ -129,7 +139,11 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
     (await page.locator('[role="status"], [role="alert"]').allTextContents()).join(" | ");
 
   const selectAdminTab = async (name) => {
-    const tab = page.getByRole("button", { name });
+    // Las categorías del editor pueden llamarse igual que las pestañas, así que
+    // el localizador se limita a la navegación de tipos de contenido.
+    const tab = page
+      .locator('nav[aria-label="Tipo de contenido"]')
+      .getByRole("button", { name });
     for (let attempt = 0; attempt < 20; attempt += 1) {
       await tab.click();
       if ((await tab.getAttribute("aria-pressed")) === "true") return tab;
@@ -200,6 +214,39 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
       `new book did not focus editor; errors: ${runtimeErrors.join(" | ")}`,
     );
     await fillCommonFields(bookTitle, "Descripción inicial para probar la ficha de biblioteca.");
+
+    // La regresión original: el botón de guardar quedaba detrás de todo el
+    // catálogo y había que recorrer la lista entera para pulsarlo.
+    const saveButtonPlacement = await page.evaluate(() => {
+      const button = document.querySelector('#admin-editor button[type="submit"]');
+      const box = button.getBoundingClientRect();
+      return {
+        top: box.top,
+        bottom: box.bottom,
+        viewportHeight: window.innerHeight,
+        pageScroll: window.scrollY,
+      };
+    });
+    assert.ok(
+      saveButtonPlacement.top >= 0 &&
+        saveButtonPlacement.bottom <= saveButtonPlacement.viewportHeight + 1,
+      `el botón de guardar debe verse sin recorrer el catálogo: ${JSON.stringify(saveButtonPlacement)}`,
+    );
+
+    // Categorías múltiples: la predeterminada sigue marcada y se añade otra nueva.
+    const categoryGroup = page.getByRole("group", { name: "Categorías *" });
+    assert.equal(
+      await categoryGroup.getByRole("button", { name: "Biblioteca" }).getAttribute("aria-pressed"),
+      "true",
+    );
+    await page.locator("#admin-new-category").fill(extraCategory);
+    await page.getByRole("button", { name: "Añadir" }).click();
+    await page.getByRole("status").filter({ hasText: /Categoría .* creada/ }).waitFor();
+    assert.equal(
+      await categoryGroup.getByRole("button", { name: extraCategory }).getAttribute("aria-pressed"),
+      "true",
+      "la categoría recién creada queda seleccionada",
+    );
     const coverPng = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
       "base64",
@@ -237,6 +284,11 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
       (await bookCard.getByRole("img", { name: `Imagen de ${bookTitle}` }).getAttribute("style")) || "",
       /\/media\/book-covers\//,
     );
+    assert.match(
+      await bookCard.textContent(),
+      new RegExp(`Biblioteca · ${extraCategory}`),
+      "la ficha del estudio muestra todas sus categorías",
+    );
     await bookCard.getByRole("button", { name: `Editar ${bookTitle}` }).click();
     await page.waitForFunction(
       () => document.activeElement?.id === "admin-content-title",
@@ -273,7 +325,13 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
     });
     await page.getByRole("button", { name: "Guardar cambios" }).click();
     await saveResponseHeld;
-    assert.equal(await page.getByRole("button", { name: /Cursos/ }).isDisabled(), true);
+    assert.equal(
+      await page
+        .locator('nav[aria-label="Tipo de contenido"]')
+        .getByRole("button", { name: /Cursos/ })
+        .isDisabled(),
+      true,
+    );
     assert.equal(await page.getByRole("button", { name: "Cancelar" }).isDisabled(), true);
     assert.equal(
       await page.getByRole("button", { name: `Editar ${bookTitle}` }).isDisabled(),
@@ -301,11 +359,32 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
       }
       if (image.naturalWidth < 1) throw new Error("the uploaded cover did not render");
     });
-    assert.equal(await page.getByRole("group", { name: "Filtrar por categoría" }).count(), 1);
+    const libraryFilters = page.getByRole("group", { name: "Filtrar por categoría" });
+    assert.equal(await libraryFilters.count(), 1);
     assert.equal(
       await page.getByRole("button", { name: "Todos" }).getAttribute("aria-pressed"),
       "true",
     );
+    for (const name of ["Biblioteca", extraCategory]) {
+      assert.equal(
+        await libraryFilters.getByRole("button", { name, exact: true }).count(),
+        1,
+        `falta el filtro ${name}`,
+      );
+    }
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      await libraryFilters.getByRole("button", { name: extraCategory, exact: true }).click();
+      if (
+        (await libraryFilters
+          .getByRole("button", { name: extraCategory, exact: true })
+          .getAttribute("aria-pressed")) === "true"
+      ) {
+        break;
+      }
+      await page.waitForTimeout(100);
+    }
+    await page.getByRole("heading", { name: bookTitle }).waitFor();
+    await libraryFilters.getByRole("button", { name: "Todos", exact: true }).click();
     const librarySearch = page.getByRole("searchbox");
     for (let attempt = 0; attempt < 20; attempt += 1) {
       await librarySearch.fill("");

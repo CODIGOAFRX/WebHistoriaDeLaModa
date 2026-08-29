@@ -284,13 +284,22 @@
   padding-top: clamp(2rem, 4vw, 4rem);
 }
 
+/*
+ * El editor es más alto que la pantalla: si compartiera el scroll de la página
+ * habría que recorrer todo el catálogo para llegar al botón de guardar, así que
+ * se desplaza por dentro y el botón queda fijo al pie del panel.
+ */
 .editor {
+  --admin-editor-offset: calc(var(--header-height, 92px) + 1.5rem);
   position: sticky;
-  top: 1.5rem;
+  top: var(--admin-editor-offset);
+  max-height: calc(100dvh - var(--admin-editor-offset) - 1.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: clamp(1.25rem, 2.6vw, 2rem);
   border: 1px solid var(--admin-line);
   background: rgba(255, 255, 255, 0.66);
-  scroll-margin-top: 1.5rem;
+  scroll-margin-top: var(--admin-editor-offset);
 }
 
 .panelHeading {
@@ -486,10 +495,150 @@
 }
 
 .saveButton {
+  position: sticky;
+  z-index: 2;
+  bottom: 0;
   grid-column: 1 / -1;
   width: 100%;
   min-height: 3.2rem;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+/* Categorías */
+.categoryField {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.categoryHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.categoryHeading > span {
+  color: #47413f;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.categoryOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+  padding: 0.7rem;
+  border: 1px solid var(--admin-line);
+  background: var(--admin-white);
+}
+
+.categoryOption {
+  display: inline-flex;
+}
+
+.categoryChip {
+  min-height: 2.3rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--admin-line);
+  border-radius: 0;
+  color: var(--admin-ink);
+  background: transparent;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.categoryChip:hover:not(:disabled),
+.categoryChip:focus-visible {
+  border-color: var(--admin-ink);
+  background: var(--admin-pink);
+}
+
+.categoryChipActive,
+.categoryChipActive:hover:not(:disabled) {
+  border-color: var(--admin-ink);
+  color: var(--admin-white);
+  background: var(--admin-ink);
+}
+
+.categoryChip > span {
+  margin-right: 0.35rem;
+}
+
+.categoryDelete {
+  min-width: 2.3rem;
+  min-height: 2.3rem;
+  border: 1px solid var(--admin-line);
+  border-left: 0;
+  border-radius: 0;
+  color: #8a3f3a;
+  background: transparent;
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.categoryDelete:hover:not(:disabled),
+.categoryDelete:focus-visible {
+  color: var(--admin-white);
+  background: #8a3f3a;
+}
+
+.categoryEmpty {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.categoryCreate {
+  display: grid;
+  gap: 0.48rem;
+}
+
+.categoryCreateRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.categoryCreateRow input {
+  flex: 1;
+  min-width: 0;
+}
+
+.categoryCreateButton {
+  min-height: 2.75rem;
+  padding: 0.62rem 1.1rem;
+  border: 1px solid var(--admin-ink);
+  border-radius: 0;
+  color: var(--admin-white);
+  background: var(--admin-ink);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.categoryCreateButton:hover:not(:disabled),
+.categoryCreateButton:focus-visible {
+  color: var(--admin-ink);
+  background: var(--admin-pink);
+}
+
+.categoryCreate small {
+  color: var(--admin-muted);
+  font-size: 0.64rem;
+  line-height: 1.5;
 }
 
 .catalog {
@@ -900,6 +1049,8 @@
 
   .editor {
     position: static;
+    max-height: none;
+    overflow: visible;
   }
 }
 

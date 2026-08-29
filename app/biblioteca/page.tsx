@@ -17,7 +17,11 @@ export default async function LibraryPage() {
       title: book.title,
       author: book.author,
       description: book.description,
-      category: book.category,
+      categories: book.categories.length
+        ? book.categories
+        : book.category
+          ? [book.category]
+          : [],
       coverUrl: book.imageUrl,
       featured: false,
     }));

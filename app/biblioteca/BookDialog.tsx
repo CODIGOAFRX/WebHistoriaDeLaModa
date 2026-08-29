@@ -108,7 +108,9 @@ export function BookDialog({ book, onClose }: { book: LibraryBook | null; onClos
             </div>
 
             <div className="book-dialog-copy">
-              {book.category ? <p className="book-dialog-category">{book.category}</p> : null}
+              {book.categories.length ? (
+                <p className="book-dialog-category">{book.categories.join(" · ")}</p>
+              ) : null}
               <h2 id="book-dialog-title">{book.title}</h2>
               {book.author ? <p className="book-dialog-author">{book.author}</p> : null}
               <div className="book-dialog-text">

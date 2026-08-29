@@ -5,6 +5,8 @@ import {
   FALLBACK_BOOKS,
   FALLBACK_COURSES,
   getAdminContent,
+  getCategoryCatalog,
+  type CategoryRecord,
 } from "@/db/content";
 import { AdminStudio } from "./AdminStudio";
 import {
@@ -33,6 +35,7 @@ export default async function AdminPage() {
 
   let books = FALLBACK_BOOKS.map((book) => ({ ...book }));
   let courses = FALLBACK_COURSES.map((course) => ({ ...course }));
+  let categories: CategoryRecord[] = [];
   let storageAvailable = false;
   let storageMessage =
     "D1 no está enlazado. Puedes revisar el estudio, pero guardar está desactivado.";
@@ -41,6 +44,7 @@ export default async function AdminPage() {
     const content = await getAdminContent();
     books = content.books;
     courses = content.courses;
+    categories = await getCategoryCatalog();
     storageAvailable = true;
     storageMessage = "";
   } catch {
@@ -51,6 +55,7 @@ export default async function AdminPage() {
     <AdminStudio
       initialBooks={books}
       initialCourses={courses}
+      initialCategories={categories}
       storageAvailable={storageAvailable}
       storageMessage={storageMessage}
       viewer={{
