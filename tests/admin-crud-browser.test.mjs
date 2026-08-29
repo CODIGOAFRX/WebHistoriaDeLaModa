@@ -216,21 +216,39 @@ test("D1-backed admin buttons create, edit, publish and delete books and courses
     await fillCommonFields(bookTitle, "Descripción inicial para probar la ficha de biblioteca.");
 
     // La regresión original: el botón de guardar quedaba detrás de todo el
-    // catálogo y había que recorrer la lista entera para pulsarlo.
+    // catálogo y había que recorrer la lista entera para pulsarlo. Ahora el
+    // panel tiene su propio scroll y el botón cierra el formulario sin flotar
+    // por encima de los campos.
     const saveButtonPlacement = await page.evaluate(() => {
-      const button = document.querySelector('#admin-editor button[type="submit"]');
+      const editor = document.querySelector("#admin-editor");
+      const button = editor.querySelector('button[type="submit"]');
+      const pageScrollBefore = window.scrollY;
+      const floats = getComputedStyle(button).position !== "static";
+      editor.scrollTop = editor.scrollHeight;
       const box = button.getBoundingClientRect();
       return {
+        floats,
         top: box.top,
         bottom: box.bottom,
         viewportHeight: window.innerHeight,
-        pageScroll: window.scrollY,
+        editorScrolls: editor.scrollHeight > editor.clientHeight,
+        pageMoved: window.scrollY !== pageScrollBefore,
       };
     });
+    assert.equal(
+      saveButtonPlacement.floats,
+      false,
+      "el botón de guardar no debe superponerse a los campos del formulario",
+    );
     assert.ok(
-      saveButtonPlacement.top >= 0 &&
+      saveButtonPlacement.editorScrolls,
+      `la ficha debe desplazarse por dentro: ${JSON.stringify(saveButtonPlacement)}`,
+    );
+    assert.ok(
+      !saveButtonPlacement.pageMoved &&
+        saveButtonPlacement.top >= 0 &&
         saveButtonPlacement.bottom <= saveButtonPlacement.viewportHeight + 1,
-      `el botón de guardar debe verse sin recorrer el catálogo: ${JSON.stringify(saveButtonPlacement)}`,
+      `el botón debe alcanzarse dentro de la ficha, sin recorrer el catálogo: ${JSON.stringify(saveButtonPlacement)}`,
     );
 
     // Categorías múltiples: la predeterminada sigue marcada y se añade otra nueva.

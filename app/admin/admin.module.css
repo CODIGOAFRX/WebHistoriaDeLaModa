@@ -494,14 +494,15 @@
   cursor: pointer;
 }
 
+/*
+ * El botón cierra el formulario en su sitio, sin flotar sobre los campos: el
+ * panel tiene su propio scroll, así que se llega a él sin recorrer el catálogo.
+ */
 .saveButton {
-  position: sticky;
-  z-index: 2;
-  bottom: 0;
   grid-column: 1 / -1;
   width: 100%;
   min-height: 3.2rem;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 /* Categorías */
