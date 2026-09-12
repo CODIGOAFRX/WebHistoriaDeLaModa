@@ -22,6 +22,22 @@ npm test
 npm run lint
 ```
 
+Para comprobar específicamente la biblioteca en WebKit 18, WebKit actual y
+Chromium (Microsoft Edge en Windows):
+
+```bash
+npm run test:library:install
+npm run test:library
+```
+
+La prueba usa los componentes reales y los estilos globales con libros de prueba,
+sin conectarse a D1 ni modificar datos publicados. Comprueba filtros, búsqueda,
+apertura, altura visible, desplazamiento hasta el final y cierre de fichas en
+escritorio, tableta y móvil. Las capturas quedan en `outputs/library-safari/`.
+La versión antigua de WebKit permite detectar el colapso de altura que ya no
+se reproduce en versiones recientes del motor. No sustituye una prueba en un
+iPhone o Mac físico.
+
 ## Publicación en Cloudflare
 
 El proyecto se publica como Cloudflare Worker con D1 y R2. La configuración está en

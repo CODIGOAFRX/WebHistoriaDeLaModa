@@ -2394,7 +2394,9 @@ body.book-dialog-open {
   display: flex;
   width: 100%;
   min-height: 0;
-  flex: 1;
+  /* Safari 18 colapsa la ficha con flex-basis: 0% cuando el diálogo
+     tiene altura automática. Partir del contenido mantiene la altura. */
+  flex: 1 1 auto;
   flex-direction: column;
 }
 
@@ -2451,7 +2453,7 @@ body.book-dialog-open {
 
 .book-dialog-scroll {
   min-height: 0;
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-color: rgba(255, 253, 249, 0.3) transparent;
