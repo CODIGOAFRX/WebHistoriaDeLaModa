@@ -202,62 +202,6 @@ export default function ArchivePage() {
         </div>
       </section>
 
-      <section className="press-pieces shell section-pad">
-        <div className="press-pieces-heading">
-          <p className="eyebrow">Papel y antena</p>
-          <h2>En papel y en radio.</h2>
-          <p>
-            Colaboraciones que solo existen impresas o emitidas y que se recogen aquí
-            en su forma original.
-          </p>
-        </div>
-
-        <div className="press-pieces-grid">
-          <Reveal as="article" className="press-piece press-piece-print">
-            <div className="press-piece-sheet">
-              <img
-                src="/images/media/telva-foto-datada-gwyneth-paltrow.webp"
-                alt="Página de la sección Foto datada de TELVA firmada por Carlos Sánchez de Medina Alcina, con una imagen de Gwyneth Paltrow en 1995"
-                loading="lazy"
-              />
-            </div>
-            <div className="press-piece-meta">
-              <span>Revista · Papel</span>
-              <span>Octubre 2026</span>
-            </div>
-            <p className="eyebrow">TELVA</p>
-            <h3>Foto datada: 1995, Gwyneth Paltrow</h3>
-            <p className="press-piece-description">
-              Invitado en la sección Foto datada para revisar el minimalismo de los
-              noventa a partir de una imagen de Gwyneth Paltrow vestida de Calvin Klein.
-            </p>
-          </Reveal>
-
-          <Reveal as="article" className="press-piece press-piece-audio" delay={90}>
-            <div className="press-piece-meta">
-              <span>Radio · 22 min</span>
-              <span>2026</span>
-            </div>
-            <p className="eyebrow">Radio Euskadi</p>
-            <h3>De cintura para abajo: el final del pantalón pitillo</h3>
-            <p className="press-piece-description">
-              Colaboración como especialista en la sección de moda del programa,
-              dedicada al debate sobre si el pantalón pitillo ha llegado a su fin.
-            </p>
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption -- La emisora entrega el corte sin subtítulos ni transcripción. */}
-            <audio
-              className="press-piece-player"
-              controls
-              preload="none"
-              aria-label="De cintura para abajo, el final del pantalón pitillo, en Radio Euskadi"
-              src="/audio/radio-euskadi-de-cintura-para-abajo-pitillos.mp3"
-            >
-              Tu navegador no puede reproducir este audio.
-            </audio>
-          </Reveal>
-        </div>
-      </section>
-
       <section className="archive-index">
         <div className="shell section-pad-sm">
           <div className="archive-index-heading">
@@ -289,6 +233,63 @@ export default function ArchivePage() {
                 </div>
               </details>
             ))}
+          </div>
+
+          <div className="press-pieces">
+            <div className="press-pieces-heading">
+              <p className="eyebrow">Papel y antena</p>
+              <h2>En papel y en radio.</h2>
+              <p>
+                Colaboraciones que solo existen impresas o emitidas y que se recogen
+                aquí en su forma original.
+              </p>
+            </div>
+
+            <div className="press-pieces-grid">
+              <Reveal as="article" className="press-piece press-piece-print">
+                <div className="press-piece-sheet">
+                  <img
+                    src="/images/media/telva-foto-datada-gwyneth-paltrow.webp"
+                    alt="Página de la sección Foto datada de TELVA firmada por Carlos Sánchez de Medina Alcina, con una imagen de Gwyneth Paltrow en 1995"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="press-piece-meta">
+                  <span>Revista · Papel</span>
+                  <span>Octubre 2026</span>
+                </div>
+                <p className="eyebrow">TELVA</p>
+                <h3>Foto datada: 1995, Gwyneth Paltrow</h3>
+                <p className="press-piece-description">
+                  Invitado en la sección Foto datada para revisar el minimalismo de los
+                  noventa a partir de una imagen de Gwyneth Paltrow vestida de Calvin
+                  Klein.
+                </p>
+              </Reveal>
+
+              <Reveal as="article" className="press-piece press-piece-audio" delay={90}>
+                <div className="press-piece-meta">
+                  <span>Radio · 22 min</span>
+                  <span>2026</span>
+                </div>
+                <p className="eyebrow">Radio Euskadi</p>
+                <h3>De cintura para abajo: el final del pantalón pitillo</h3>
+                <p className="press-piece-description">
+                  Colaboración como especialista en la sección de moda del programa,
+                  dedicada al debate sobre si el pantalón pitillo ha llegado a su fin.
+                </p>
+                {/* eslint-disable-next-line jsx-a11y/media-has-caption -- La emisora entrega el corte sin subtítulos ni transcripción. */}
+                <audio
+                  className="press-piece-player"
+                  controls
+                  preload="metadata"
+                  aria-label="De cintura para abajo, el final del pantalón pitillo, en Radio Euskadi"
+                  src="/api/audio/radio-euskadi-de-cintura-para-abajo-pitillos.mp3"
+                >
+                  Tu navegador no puede reproducir este audio.
+                </audio>
+              </Reveal>
+            </div>
           </div>
         </div>
       </section>
