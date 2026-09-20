@@ -94,6 +94,7 @@ const fullArchive = [
   {
     title: "Entrevistas",
     items: [
+      ["Buenos Días Aragón Magazine · Los tocadores isabelinos", "https://www.aragonplay.es/show/buenos-dias-aragon-magazine/episode/buenos-dias-aragon-magazine-17-09-2026-11-00"],
       ["Ya no queremos Versace", "https://www.youtube.com/watch?v=kND6J93eFaA&list=PLZkzby6iVML5heKK8z2HAg6YZsawcQ4X1&index=25&t=904s"],
       ["Entrevista en Cadena SER", "https://cadenaser.com/audio/1784274475687/"],
       ["La historia de los pantalones vaqueros · Más de uno (Onda Cero)", "https://www.youtube.com/watch?v=eZGq2_RdGQ4"],
@@ -118,6 +119,7 @@ const fullArchive = [
   {
     title: "Citas y fuentes",
     items: [
+      ["The New York Times · Spain's Preppies Conservatives Are Having a Moment", "https://www.nytimes.com/2026/09/18/world/europe/spain-conservative-culture-cayetano.html?unlocked_article_code=1.CFE.NHzx.GfNMXQ7NQoGo"],
       ["El País ICON · Un hombre con abanico", "https://elpais.com/icon/2025-08-10/un-hombre-con-abanico-pierde-su-masculinidad-fragil-por-que-sigue-siendo-un-complemento-asociado-a-lo-femenino.html"],
       ["¡HOLA! Fashion · Estética flapper", "https://www.hola.com/fashion/tendencias/2022011272771/estetica-flapper-vestidos-flecos/"],
       ["El País S Moda · Ray-Ban Wayfarer", "https://elpais.com/smoda/moda/historia-ray-ban-wayfarer-disenador-invencion-20-grados-inclinacion.html"],
@@ -197,6 +199,62 @@ export default function ArchivePage() {
               </a>
             </Reveal>
           ))}
+        </div>
+      </section>
+
+      <section className="press-pieces shell section-pad">
+        <div className="press-pieces-heading">
+          <p className="eyebrow">Papel y antena</p>
+          <h2>En papel y en radio.</h2>
+          <p>
+            Colaboraciones que solo existen impresas o emitidas y que se recogen aquí
+            en su forma original.
+          </p>
+        </div>
+
+        <div className="press-pieces-grid">
+          <Reveal as="article" className="press-piece press-piece-print">
+            <div className="press-piece-sheet">
+              <img
+                src="/images/media/telva-foto-datada-gwyneth-paltrow.webp"
+                alt="Página de la sección Foto datada de TELVA firmada por Carlos Sánchez de Medina Alcina, con una imagen de Gwyneth Paltrow en 1995"
+                loading="lazy"
+              />
+            </div>
+            <div className="press-piece-meta">
+              <span>Revista · Papel</span>
+              <span>Octubre 2026</span>
+            </div>
+            <p className="eyebrow">TELVA</p>
+            <h3>Foto datada: 1995, Gwyneth Paltrow</h3>
+            <p className="press-piece-description">
+              Invitado en la sección Foto datada para revisar el minimalismo de los
+              noventa a partir de una imagen de Gwyneth Paltrow vestida de Calvin Klein.
+            </p>
+          </Reveal>
+
+          <Reveal as="article" className="press-piece press-piece-audio" delay={90}>
+            <div className="press-piece-meta">
+              <span>Radio · 22 min</span>
+              <span>2026</span>
+            </div>
+            <p className="eyebrow">Radio Euskadi</p>
+            <h3>De cintura para abajo: el final del pantalón pitillo</h3>
+            <p className="press-piece-description">
+              Colaboración como especialista en la sección de moda del programa,
+              dedicada al debate sobre si el pantalón pitillo ha llegado a su fin.
+            </p>
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption -- La emisora entrega el corte sin subtítulos ni transcripción. */}
+            <audio
+              className="press-piece-player"
+              controls
+              preload="none"
+              aria-label="De cintura para abajo, el final del pantalón pitillo, en Radio Euskadi"
+              src="/audio/radio-euskadi-de-cintura-para-abajo-pitillos.mp3"
+            >
+              Tu navegador no puede reproducir este audio.
+            </audio>
+          </Reveal>
         </div>
       </section>
 

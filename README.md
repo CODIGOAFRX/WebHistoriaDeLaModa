@@ -87,3 +87,7 @@ inseguro: debe reemplazarse antes de publicar. No publiques `.env.local`.
 
 Los recursos optimizados están en `public/images/`. Los originales entregados se
 mantienen fuera del proyecto y no se modifican.
+
+Los cortes de audio que no tienen enlace público viven en `public/audio/` y se
+reproducen desde `/archivo`. Se recodifican a MP3 mono de 64 kbps para no superar
+el límite de 25 MiB por archivo que impone Cloudflare Workers.
